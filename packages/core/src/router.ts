@@ -1,0 +1,93 @@
+import type { Handler, HttpMethod, Middleware, RouteMatch } from "./types.js";
+
+interface Node {
+  static: Map<string, Node>;
+  paramName?: string;
+  paramChild?: Node;
+  wildcardChild?: Node;
+  handlers: Map<HttpMethod, Handler<any>>;
+  middlewares: Middleware<any>[];
+}
+
+function createNode(): Node {
+  return { static: new Map(), handlers: new Map(), middlewares: [] };
+}
+
+/**
+ * A small trie (prefix tree) router. Supports:
+ *  - static segments: /users/active
+ *  - params:          /users/:id
+ *  - wildcards:       /files/*             (captured as params['*'])
+ *
+ * Deliberately not regex-based: trie lookup is O(path segments), which keeps
+ * routing cost flat and predictable even with thousands of routes — matters
+ * on cold starts where every millisecond of setup/lookup counts.
+ */
+export class Router {
+  private root: Node = createNode();
+
+  add(method: HttpMethod, path: string, handler: Handler<any>, middlewares: Middleware<any>[] = []): void {
+    const segments = splitPath(path);
+    let node = this.root;
+
+    for (const segment of segments) {
+      if (segment === "*") {
+        node.wildcardChild ??= createNode();
+        node = node.wildcardChild;
+      } else if (segment.startsWith(":")) {
+        node.paramChild ??= createNode();
+        node.paramName = segment.slice(1);
+        node = node.paramChild;
+      } else {
+        if (!node.static.has(segment)) node.static.set(segment, createNode());
+        node = node.static.get(segment)!;
+      }
+    }
+
+    node.handlers.set(method, handler);
+    node.middlewares = middlewares;
+  }
+
+  match(method: HttpMethod, path: string): RouteMatch | null {
+    const segments = splitPath(path);
+    const params: Record<string, string> = {};
+    const node = this.walk(this.root, segments, 0, params);
+    if (!node) return null;
+
+    const handler = node.handlers.get(method) ?? node.handlers.get("ALL");
+    if (!handler) return null;
+
+    return { handler, params, middlewares: node.middlewares };
+  }
+
+  private walk(node: Node, segments: string[], i: number, params: Record<string, string>): Node | null {
+    if (i === segments.length) return node.handlers.size > 0 ? node : null;
+
+    const segment = segments[i]!;
+
+    const staticChild = node.static.get(segment);
+    if (staticChild) {
+      const result = this.walk(staticChild, segments, i + 1, params);
+      if (result) return result;
+    }
+
+    if (node.paramChild && node.paramName) {
+      params[node.paramName] = decodeURIComponent(segment);
+      const result = this.walk(node.paramChild, segments, i + 1, params);
+      if (result) return result;
+      delete params[node.paramName];
+    }
+
+    if (node.wildcardChild) {
+      params["*"] = segments.slice(i).join("/");
+      return node.wildcardChild.handlers.size > 0 ? node.wildcardChild : null;
+    }
+
+    return null;
+  }
+}
+
+function splitPath(path: string): string[] {
+  const trimmed = path.split("?")[0]!.replace(/^\/+|\/+$/g, "");
+  return trimmed.length === 0 ? [] : trimmed.split("/");
+}

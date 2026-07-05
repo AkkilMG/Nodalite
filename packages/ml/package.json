@@ -1,0 +1,34 @@
+{
+  "name": "@nodalite/ml",
+  "version": "0.1.0",
+  "description": "Serverless-aware runner for lightweight ML models: caches model bytes to disk across cold starts, reuses the loaded session across warm invocations, and de-duplicates concurrent cold-start loads. Engine-agnostic (ships an optional ONNX Runtime adapter; bring your own for anything else).",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean --minify",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "onnxruntime-node": "^1.19.0"
+  },
+  "peerDependenciesMeta": {
+    "onnxruntime-node": { "optional": true }
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4",
+    "@types/node": "^22.9.0"
+  }
+}

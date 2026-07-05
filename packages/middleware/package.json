@@ -1,0 +1,31 @@
+{
+  "name": "@nodalite/middleware",
+  "version": "0.1.0",
+  "description": "Batteries-included security & HTTP middleware for Nodalite: CORS, security headers, rate limiting, and JWT auth.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean --minify",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@nodalite/core": "workspace:*",
+    "jose": "^5.9.6"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}

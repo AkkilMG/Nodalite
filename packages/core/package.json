@@ -1,0 +1,28 @@
+{
+  "name": "@nodalite/core",
+  "version": "0.1.0",
+  "description": "Tiny, runtime-agnostic router + context + middleware engine for Nodalite. Built on the standard Fetch Request/Response API so it works identically on Node, Bun, Deno, Workers and Lambda.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean --minify",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}

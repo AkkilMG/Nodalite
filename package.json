@@ -1,0 +1,21 @@
+{
+  "name": "nodalite-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.10.0",
+  "scripts": {
+    "build": "pnpm -r --filter=./packages/* run build",
+    "test": "vitest run",
+    "typecheck": "pnpm -r --filter=./packages/* exec tsc --noEmit",
+    "lint": "eslint . --ext .ts",
+    "changeset": "changeset",
+    "release": "pnpm build && changeset publish",
+    "dev:basic": "pnpm --filter examples-basic-api dev"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "tsup": "^8.3.5",
+    "vitest": "^2.1.4",
+    "@types/node": "^22.9.0"
+  }
+}
