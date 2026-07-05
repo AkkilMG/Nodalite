@@ -8,9 +8,9 @@
     "package": "npm run build && cd dist && zip -r ../function.zip index.mjs"
   },
   "dependencies": {
-    "@nodalite/core": "workspace:*",
-    "@nodalite/middleware": "workspace:*",
-    "@nodalite/adapter-lambda": "workspace:*"
+    "@nodalite/core": "*",
+    "@nodalite/middleware": "*",
+    "@nodalite/adapter-lambda": "*"
   },
   "devDependencies": {
     "esbuild": "^0.24.0",

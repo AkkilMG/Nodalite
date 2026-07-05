@@ -288,10 +288,10 @@ This section is the "how do I actually maintain and publish this" playbook.
 
 ### 8.1 Monorepo tooling
 
-- **pnpm workspaces** (`pnpm-workspace.yaml`) for the monorepo. `workspace:*`
-  dependencies between packages resolve to the local package during
-  development and get replaced with real version ranges automatically at
-  publish time.
+- **npm workspaces** (configured via `"workspaces"` in root `package.json`)
+  for the monorepo. `"*"` dependencies between packages resolve to the local
+  package during development and get replaced with real version ranges
+  automatically at publish time.
 - **tsup** to build each package to both ESM (`dist/index.js`) and CJS
   (`dist/index.cjs`) with generated `.d.ts` files — this is what lets your
   package work for consumers on either module system without them needing
@@ -309,24 +309,24 @@ For a multi-package repo where packages depend on each other, use
 [Changesets](https://github.com/changesets/changesets):
 
 ```bash
-pnpm add -Dw @changesets/cli
-pnpm changeset init
+npm install -D @changesets/cli
+npx changeset init
 ```
 
 Workflow:
-1. After making a change, run `pnpm changeset` — it asks which packages
-   changed and whether it's a patch/minor/major bump, and writes a small
-   markdown file describing the change.
+1. After making a change, run `npx changeset` — it asks which packages
+    changed and whether it's a patch/minor/major bump, and writes a small
+    markdown file describing the change.
 2. Merge that alongside your PR.
-3. A CI job (or you, locally) runs `pnpm changeset version` — this bumps
-   every affected package's `package.json`, updates their changelogs, and
-   crucially **bumps the `workspace:*` ranges of dependent packages to real
-   version numbers**.
-4. `pnpm -r publish` (or `changeset publish`) publishes everything that
+3. A CI job (or you, locally) runs `npx changeset version` — this bumps
+    every affected package's `package.json`, updates their changelogs, and
+    crucially **bumps the `"*"` ranges of dependent packages to real version
+    numbers**.
+4. `npm publish --workspaces` (or `npx changeset publish`) publishes everything that
    changed to npm in the correct dependency order.
 
 This is what keeps `@nodalite/middleware`'s dependency on
-`@nodalite/core: workspace:*` from ever pointing at a broken/nonexistent
+`@nodalite/core: *` from ever pointing at a broken/nonexistent
 version once published.
 
 ### 8.3 Semantic versioning discipline
@@ -338,7 +338,7 @@ version once published.
 - Adapters (`adapter-node`, `adapter-lambda`, `adapter-edge`) can iterate
   faster (their consumers are apps, not other packages), but breaking the
   `serve()`/`createLambdaHandler()` call signature is still major.
-- Use `pnpm changeset` honestly — resist the urge to under-bump a breaking
+- Use `npx changeset` honestly — resist the urge to under-bump a breaking
   change to avoid a major version number; consumers pinning `^` ranges will
   get broken installs otherwise.
 
@@ -363,7 +363,7 @@ same two-method interface, so the logic under test (caching, dedup, warm
 reuse) is validated for real while the expensive native dependency stays
 optional.
 
-Run everything: `pnpm test` from the repo root (Vitest, configured via
+Run everything: `npm test` from the repo root (Vitest, configured via
 `vitest.config.ts` to pick up every package's `src/**/*.test.ts`).
 
 ### 8.5 CI/CD (GitHub Actions sketch)
@@ -377,13 +377,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
       - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm -r --filter=./packages/* exec tsc --noEmit
-      - run: pnpm test
-      - run: pnpm build
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run typecheck --workspaces --if-present
+      - run: npm test
+      - run: npm run build --workspaces --if-present
 
   release:
     needs: test
@@ -391,13 +390,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
       - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
       - uses: changesets/action@v1
         with:
-          publish: pnpm release
+          publish: npm run release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -411,7 +409,7 @@ open a release PR → merge it → publish to npm" loop for you.
 For public API reference docs, add [TypeDoc](https://typedoc.org/):
 
 ```bash
-pnpm add -Dw typedoc
+npm install -D typedoc
 npx typedoc --entryPointStrategy packages "packages/*" --out docs/api
 ```
 
@@ -435,7 +433,7 @@ version — raw numbers without that context aren't comparable to anything.
 
 ### 8.8 Security auditing
 
-- `pnpm audit` (or GitHub's Dependabot, enabled by default on public repos)
+- `npm audit` (or GitHub's Dependabot, enabled by default on public repos)
   for known-vulnerable dependency versions.
 - Since `@nodalite/core` has zero runtime dependencies, its own attack
   surface from supply-chain issues is minimal by construction — worth

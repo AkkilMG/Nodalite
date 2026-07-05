@@ -1,11 +1,1 @@
-// src/index.ts
-function createEdgeHandler(app) {
-  return {
-    fetch(request, env, ctx) {
-      return app.handle(request, { runtime: "edge", env, waitUntil: ctx?.waitUntil?.bind(ctx) });
-    }
-  };
-}
-export {
-  createEdgeHandler
-};
+function r(n){return{fetch(t,i,e){return n.handle(t,{runtime:"edge",env:i,waitUntil:e?.waitUntil?.bind(e)})}}}export{r as createEdgeHandler};

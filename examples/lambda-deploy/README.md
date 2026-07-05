@@ -15,9 +15,9 @@ Lambda Function URL — the event shape is auto-detected per invocation.
 ## Build & package
 
 ```bash
-pnpm install
-pnpm --filter examples-lambda-deploy build     # esbuild bundle -> dist/index.mjs
-pnpm --filter examples-lambda-deploy package    # + zip -> function.zip
+npm install
+npm run build -w examples-lambda-deploy        # esbuild bundle -> dist/index.mjs
+npm run package -w examples-lambda-deploy      # + zip -> function.zip
 ```
 
 Upload `function.zip` with handler `index.handler`, runtime `nodejs20.x`.

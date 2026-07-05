@@ -17,10 +17,11 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --clean --minify",
-    "test": "vitest run"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@nodalite/core": "workspace:*",
+    "@nodalite/core": "*",
     "jose": "^5.9.6"
   },
   "devDependencies": {

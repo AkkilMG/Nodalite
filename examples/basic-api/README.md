@@ -16,8 +16,8 @@ Demonstrates most of the framework in one small app:
 ## Run it
 
 ```bash
-pnpm install
-pnpm --filter examples-basic-api dev
+npm install
+npm run dev -w examples-basic-api
 ```
 
 ```bash

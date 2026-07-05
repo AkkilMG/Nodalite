@@ -8,11 +8,11 @@
     "start": "node --import tsx src/server.ts"
   },
   "dependencies": {
-    "@nodalite/core": "workspace:*",
-    "@nodalite/middleware": "workspace:*",
-    "@nodalite/adapter-node": "workspace:*",
-    "@nodalite/scheduler": "workspace:*",
-    "@nodalite/workers": "workspace:*",
+    "@nodalite/core": "*",
+    "@nodalite/middleware": "*",
+    "@nodalite/adapter-node": "*",
+    "@nodalite/scheduler": "*",
+    "@nodalite/workers": "*",
     "zod": "^3.24.1"
   },
   "devDependencies": {

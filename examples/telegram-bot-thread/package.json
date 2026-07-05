@@ -7,9 +7,9 @@
     "dev": "tsx watch src/main.ts"
   },
   "dependencies": {
-    "@nodalite/core": "workspace:*",
-    "@nodalite/adapter-node": "workspace:*",
-    "@nodalite/workers": "workspace:*"
+    "@nodalite/core": "*",
+    "@nodalite/adapter-node": "*",
+    "@nodalite/workers": "*"
   },
   "devDependencies": {
     "tsx": "^4.19.2",

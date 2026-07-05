@@ -63,27 +63,27 @@ server signature — no adapter needed at all.
   `WorkerPool` (swap in a real ONNX model via `@nodalite/ml` and the wiring
   doesn't change). Run it:
   ```bash
-  pnpm install && pnpm --filter examples-basic-api dev
+  npm install && npm run dev -w examples-basic-api
   ```
 - **`examples/telegram-bot-thread`** — the same API server, plus a Telegram
   bot's long-polling loop running on an independent, supervised
   `worker_thread` via `runDetached()`. Set `TELEGRAM_BOT_TOKEN` and run:
   ```bash
-  pnpm --filter examples-telegram-bot-thread dev
+  npm run dev -w examples-telegram-bot-thread
   ```
 - **`examples/lambda-deploy`** — the same `App` shape, deployed as a real
   AWS Lambda function, with a working esbuild bundle + zip script:
   ```bash
-  pnpm --filter examples-lambda-deploy build
+  npm run build -w examples-lambda-deploy
   ```
 
 ## Development
 
 ```bash
-pnpm install         # install everything across the workspace
-pnpm build            # build every package (tsup, ESM + CJS + .d.ts)
-pnpm test             # run every package's test suite (Vitest)
-pnpm typecheck        # tsc --noEmit across every package
+npm install           # install everything across the workspace
+npm run build --workspaces --if-present  # build every package (tsup, ESM + CJS + .d.ts)
+npm test              # run every package's test suite (Vitest)
+npm run typecheck --workspaces --if-present  # tsc --noEmit across every package
 ```
 
 Every package here is genuinely tested, not just typed: `adapter-node`'s

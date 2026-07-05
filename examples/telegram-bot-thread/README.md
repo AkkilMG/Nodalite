@@ -17,8 +17,8 @@ own supervised `worker_thread` via `@nodalite/workers`' `runDetached()`.
 ## Run it
 
 ```bash
-pnpm install
-TELEGRAM_BOT_TOKEN=your-token-here pnpm --filter examples-telegram-bot-thread dev
+npm install
+TELEGRAM_BOT_TOKEN=your-token-here npm run dev -w examples-telegram-bot-thread
 ```
 
 Without a real token, the API still serves `/health` fine — the bot worker
