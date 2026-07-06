@@ -20,7 +20,6 @@
   },
   "workspaces": ["packages/*", "examples/*", "docs"],
   "scripts": {
-    "prepare": "npm run build --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
     "test": "vitest run",
     "typecheck": "npm run typecheck --workspaces --if-present",
