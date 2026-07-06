@@ -2,9 +2,21 @@
 
 Get a Nodalite API server running in two minutes.
 
+## 0. Scaffold (optional)
+
+Skip the manual setup and generate a project instantly:
+
+```bash
+npm create nodalite
+```
+
+Then skip to step 3. Otherwise, follow the manual steps below.
+
 ## 1. Install
 
 ```bash
+npm install nodalite @nodalite/middleware @nodalite/adapter-node
+# or the scoped form:
 npm install @nodalite/core @nodalite/middleware @nodalite/adapter-node
 ```
 

@@ -1,0 +1,8 @@
+import { createLambdaHandler } from "@nodalite/adapter-lambda";
+import { app } from "./app.js";
+
+export const handler = createLambdaHandler(app, {
+  onColdStart: async () => {
+    console.log("cold start");
+  },
+});

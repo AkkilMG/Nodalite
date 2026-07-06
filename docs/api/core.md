@@ -2,8 +2,19 @@
 
 The foundation of Nodalite. Zero runtime dependencies.
 
-```
+Also available as the unscoped `nodalite` package — identical exports,
+zero overhead.
+
+```bash
+npm install nodalite
+# or
 npm install @nodalite/core
+```
+
+```ts
+import { App } from 'nodalite';
+// or
+import { App } from '@nodalite/core';
 ```
 
 ## App

@@ -1,0 +1,21 @@
+{
+  "name": "{{projectName}}",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/handler.ts --bundle --platform=node --target=node20 --format=esm --outfile=dist/index.mjs --external:@aws-sdk/*",
+    "package": "npm run build && cd dist && zip -r ../function.zip index.mjs"
+  },
+  "dependencies": {
+    "nodalite": "^{{nodaliteVersion}}"
+    {{#if security}}
+    "@nodalite/middleware": "^{{nodaliteVersion}}",
+    {{/if}}
+    "@nodalite/adapter-lambda": "^{{nodaliteVersion}}"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.3"
+  }
+}

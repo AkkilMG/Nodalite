@@ -1,0 +1,25 @@
+import { App, HttpError } from "nodalite";{{#if security}}
+import { cors, rateLimit, securityHeaders } from "@nodalite/middleware";{{/if}}
+
+const startedAt = new Date().toISOString();
+
+export const app = new App({ name: "{{projectName}}" });
+
+{{#if security}}
+app.use("*", securityHeaders());
+app.use("*", cors({ origin: "*" }));
+app.use("*", rateLimit({ windowMs: 60_000, max: 50 }));
+{{/if}}
+
+app.get("/health", (c) => c.json({ ok: true, containerStartedAt: startedAt }));
+
+app.get("/items/:id", (c) => {
+  const id = c.req.param("id")!;
+  if (id === "missing") throw HttpError.notFound("No such item");
+  return c.json({ id, name: `Item ${id}` });
+});
+
+app.onError((err, c) => {
+  const httpErr = err instanceof HttpError ? err : HttpError.internal(undefined, err);
+  return c.status(httpErr.status).json(httpErr.toJSON());
+});

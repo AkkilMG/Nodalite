@@ -1,0 +1,36 @@
+{
+  "name": "create-nodalite",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkkilMG/Nodalite.git",
+    "directory": "packages/create-nodalite"
+  },
+  "bugs": {
+    "url": "https://github.com/AkkilMG/Nodalite/issues"
+  },
+  "description": "Scaffold a new Nodalite project",
+  "type": "module",
+  "bin": {
+    "create-nodalite": "./dist/cli.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/cli.ts --format esm --clean --minify && node -e \"const{cpSync}=require('node:fs');const{join}=require('node:path');cpSync(join(process.cwd(),'../../templates'),join(process.cwd(),'dist/templates'),{recursive:true})\"",
+    "dev": "tsup src/cli.ts --format esm --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "citty": "^0.1.6",
+    "consola": "^3.2.3",
+    "handlebars": "^4.7.8",
+    "picocolors": "^1.1.1",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3"
+  }
+}

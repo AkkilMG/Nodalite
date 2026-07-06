@@ -29,6 +29,7 @@ export default defineConfig({
           items: [
             { text: "What is Nodalite?", link: "/guide/" },
             { text: "Quick Start", link: "/guide/quickstart" },
+            { text: "Scaffolding", link: "/guide/scaffolding" },
             { text: "Installation", link: "/guide/installation" },
             { text: "Core Concepts", link: "/guide/core-concepts" },
           ],

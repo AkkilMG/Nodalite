@@ -1,0 +1,34 @@
+import { serve } from "@nodalite/adapter-node";
+import { app } from "./app.js";
+
+{{#if scheduler}}
+import { Scheduler } from "@nodalite/scheduler";
+
+const scheduler = new Scheduler();
+
+scheduler.every(
+  60_000,
+  () => {
+    console.log(`[scheduler] housekeeping tick at ${new Date().toISOString()}`);
+  },
+  { name: "housekeeping" }
+);
+{{/if}}
+
+const handle = serve(app, {
+  port: Number(process.env.PORT) || 3000,
+  onListen: ({ port, hostname }) => {
+    console.log(`{{projectName}} listening on http://${hostname}:${port}`);
+  },
+});
+
+async function gracefulShutdown(signal: string): Promise<void> {
+  console.log(`\nReceived ${signal}, shutting down...`);
+  {{#if scheduler}}scheduler.stopAll();{{/if}}
+  await handle.close();{{#if ml}}
+  await app.shutdown?.();{{/if}}
+  process.exit(0);
+}
+
+process.on("SIGINT", () => void gracefulShutdown("SIGINT"));
+process.on("SIGTERM", () => void gracefulShutdown("SIGTERM"));

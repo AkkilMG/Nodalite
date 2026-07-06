@@ -1,0 +1,15 @@
+import { App, HttpError } from "nodalite";
+import { createEdgeHandler } from "@nodalite/adapter-edge";
+
+export const app = new App({ name: "{{projectName}}" });
+
+app.get("/health", (c) => c.json({ status: "ok" }));
+
+app.get("/hello", (c) => c.json({ message: "Hello from Nodalite on the Edge!" }));
+
+app.onError((err, c) => {
+  const httpErr = err instanceof HttpError ? err : HttpError.internal(undefined, err);
+  return c.status(httpErr.status).json(httpErr.toJSON());
+});
+
+export default createEdgeHandler(app);

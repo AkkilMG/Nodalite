@@ -1,0 +1,18 @@
+{
+  "name": "{{projectName}}",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev src/index.ts",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "nodalite": "^{{nodaliteVersion}}",
+    "@nodalite/adapter-edge": "^{{nodaliteVersion}}"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0",
+    "typescript": "^5.6.3"
+  }
+}

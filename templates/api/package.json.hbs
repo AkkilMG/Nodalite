@@ -1,0 +1,25 @@
+{
+  "name": "{{projectName}}",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "node --import tsx src/server.ts"
+  },
+  "dependencies": {
+    "nodalite": "^{{nodaliteVersion}}",
+    "@nodalite/adapter-node": "^{{nodaliteVersion}}"
+    {{#if security}}
+    "@nodalite/middleware": "^{{nodaliteVersion}}",
+    {{/if}}
+    {{#if ml}}
+    "@nodalite/workers": "^{{nodaliteVersion}}",
+    {{/if}}
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

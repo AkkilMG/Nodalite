@@ -10,17 +10,32 @@ Individual runtimes have their own requirements:
 - **Cloudflare Workers** — compatibility check via `wrangler`
 - **Bun** 1.x or **Deno** 2.x — no adapter needed, `app.fetch` matches natively
 
-## Using individual packages
+## Quick install (scaffold)
 
-Install only what you need:
+The fastest way to start is the interactive scaffolding CLI:
 
 ```bash
-# Core (always required)
+npm create nodalite
+# or
+npx nodalite create
+```
+
+It generates a project with all necessary dependencies pre-configured.
+See the [Scaffolding guide](/guide/scaffolding) for details.
+
+## Manual install
+
+Install the core library:
+
+```bash
+npm install nodalite
+# or the scoped form:
 npm install @nodalite/core
+```
 
-# Middleware (optional)
-npm install @nodalite/middleware
+Then add adapters as needed:
 
+```bash
 # Adapters (choose your runtime)
 npm install @nodalite/adapter-node
 npm install @nodalite/adapter-lambda

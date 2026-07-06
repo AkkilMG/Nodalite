@@ -46,6 +46,7 @@ hero:
 ### First Steps
 
 - [Quick Start](/guide/quickstart) — get running in 2 minutes
+- [Scaffolding](/guide/scaffolding) — generate a project with `npm create nodalite`
 - [Installation](/guide/installation) — set up the monorepo
 - [Core Concepts](/guide/core-concepts) — how the pipeline works
 

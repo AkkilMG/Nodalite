@@ -2,6 +2,7 @@
 
 | Package | Exports | Runtime deps |
 |---|---|---|
+| [nodalite](/api/core) | Re-exports everything from `@nodalite/core`. Import as `import { App } from 'nodalite'`. | None |
 | [@nodalite/core](/api/core) | `App`, `Context`, `Router`, `HttpError`, `compose`, `validate` | None |
 | [@nodalite/middleware](/api/middleware) | `cors`, `securityHeaders`, `rateLimit`, `jwtAuth`, `logger`, `bodyLimit` | None |
 | [@nodalite/adapter-node](/api/adapter-node) | `serve`, `toFetchRequest`, `sendResponse` | None (uses built-in `http`) |

@@ -1,0 +1,82 @@
+import { App, HttpError } from "nodalite";
+import { z } from "zod";{{#if security}}
+import { bodyLimit, cors, jwtAuth, logger, rateLimit, securityHeaders, signJwt } from "@nodalite/middleware";{{/if}}{{#if ml}}
+import { WorkerPool } from "@nodalite/workers";{{/if}}
+
+{{#if ml}}
+const workerExt = import.meta.url.endsWith(".ts") ? "ts" : "js";
+const sentimentPool = new WorkerPool(
+  new URL(`./sentiment-worker.${workerExt}`, import.meta.url),
+  { size: 2, taskTimeoutMs: 5000 }
+);
+{{/if}}
+
+export const app = new App({ name: "{{projectName}}" });
+
+{{#if security}}
+app.use("*", logger());
+app.use("*", securityHeaders());
+app.use("*", cors({ origin: ["http://localhost:5173"], credentials: true }));
+app.use("*", bodyLimit(1_000_000));
+app.use("*", rateLimit({ windowMs: 60_000, max: 100 }));
+
+const JWT_SECRET = process.env.JWT_SECRET ?? "dev-secret-change-me-in-production";
+
+const signupSchema = z.object({ email: z.string().email(), password: z.string().min(8) });
+
+app.post(
+  "/auth/signup",
+  async (c) => {
+    const { email, password } = await c.req.json();
+    const token = await signJwt({ email }, { secret: JWT_SECRET, expiresIn: "1h" });
+    return c.status(201).json({ token });
+  },
+  [validate({ body: signupSchema })]
+);
+
+const loginSchema = z.object({ email: z.string().email(), password: z.string() });
+
+app.post(
+  "/auth/login",
+  async (c) => {
+    const { email } = await c.req.json();
+    const token = await signJwt({ sub: email }, { secret: JWT_SECRET, expiresIn: "1h" });
+    return c.json({ token });
+  },
+  [validate({ body: loginSchema })]
+);
+
+app.group("/api", (api) => {
+  api.use(jwtAuth({ secret: JWT_SECRET }));
+  api.get("/me", (c) => c.json(c.get("user")));{{#if ml}}
+
+  api.post(
+    "/sentiment",
+    async (c) => {
+      const { text } = await c.req.json();
+      const result = await sentimentPool.run({ text });
+      return c.json(result);
+    },
+    [validate({ body: z.object({ text: z.string().min(1).max(2000) }) })]
+  );{{/if}}
+});
+{{/if}}
+
+app.get("/health", (c) => c.json({ status: "ok" }));
+
+app.get("/hello", (c) => c.json({ message: "Hello from Nodalite!" }));{{#if ml}}{{#unless security}}
+
+app.post(
+  "/sentiment",
+  async (c) => {
+    const { text } = await c.req.json();
+    const result = await sentimentPool.run({ text });
+    return c.json(result);
+  },
+  [validate({ body: z.object({ text: z.string().min(1).max(2000) }) })]
+);{{/unless}}{{/if}}
+
+app.onError((err, c) => {
+  const httpErr = err instanceof HttpError ? err : HttpError.internal(undefined, err);
+  return c.status(httpErr.status).json(httpErr.toJSON());
+});

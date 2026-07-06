@@ -1,0 +1,41 @@
+{
+  "name": "nodalite",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkkilMG/Nodalite.git",
+    "directory": "packages/nodalite"
+  },
+  "bugs": {
+    "url": "https://github.com/AkkilMG/Nodalite/issues"
+  },
+  "description": "Runtime-agnostic TypeScript API framework — runs on Node, Lambda, Cloudflare Workers, Bun, Deno.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "bin": {
+    "nodalite": "./cli.mjs"
+  },
+  "files": ["dist", "cli.mjs"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean --minify",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nodalite/core": "*"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3"
+  }
+}

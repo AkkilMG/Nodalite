@@ -12,6 +12,8 @@ build/test/publish playbook. This README is just the quick start.
 ## Installation
 
 ```bash
+npm install nodalite
+# or the scoped form:
 npm install @nodalite/core
 ```
 
@@ -26,10 +28,26 @@ npm install @nodalite/scheduler       # Cron/interval scheduling
 npm install @nodalite/ml              # ML inference
 ```
 
+## Scaffolding
+
+Scaffold a new project in seconds:
+
+```bash
+npm create nodalite
+# or
+npx nodalite create
+```
+
+Follow the interactive prompts to select a **purpose** (API, Telegram bot,
+Lambda, Edge), and optionally add **ML inference**, **security middleware**,
+and a **job scheduler**. A ready-to-run project is generated with all
+dependencies installed.
+
 ## Packages
 
 | Package | What it is |
 |---|---|
+| `nodalite` | Unscoped alias — re-exports everything from `@nodalite/core`. |
 | `@nodalite/core` | Router, `Context`, `App`, middleware, errors, validation. Zero dependencies. |
 | `@nodalite/middleware` | `cors`, `securityHeaders`, `rateLimit`, `jwtAuth`, `logger`, `bodyLimit` |
 | `@nodalite/adapter-node` | `serve(app)` — run on a plain Node http/https server |
