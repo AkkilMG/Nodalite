@@ -15,8 +15,7 @@ function score(text: string): { sentiment: "positive" | "negative" | "neutral"; 
   // Intentionally busy-loop a bit to simulate real CPU-bound inference cost,
   // demonstrating why this belongs on a worker thread and not the main
   // event loop that's also serving other requests.
-  let busy = 0;
-  for (let i = 0; i < 2_000_000; i++) busy += Math.sqrt(i);
+  for (let i = 0; i < 2_000_000; i++) Math.sqrt(i);
 
   const pos = words.filter((w) => positiveWords.includes(w)).length;
   const neg = words.filter((w) => negativeWords.includes(w)).length;

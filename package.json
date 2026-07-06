@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "description": "Runtime-agnostic TypeScript API framework — runs on Node, Lambda, Cloudflare Workers, Bun, Deno.",
+  "type": "module",
   "keywords": ["monorepo", "api", "framework", "typescript", "runtime-agnostic", "serverless", "worker", "ml"],
   "license": "MIT",
   "author": "Akkil <me@akkil.dev>",
@@ -40,6 +41,7 @@
     "@types/node": "^22.9.0",
     "eslint": "^9.15.0",
     "@eslint/js": "^9.15.0",
-    "typescript-eslint": "^8.16.0"
+    "typescript-eslint": "^8.16.0",
+    "globals": "^15.0.0"
   }
 }

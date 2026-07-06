@@ -39,7 +39,7 @@ export function jwtAuth(opts: JwtAuthOptions): Middleware {
     try {
       const { payload } = await jwtVerify(token, key, { issuer: opts.issuer, audience: opts.audience });
       c.set(contextKey as never, payload as never);
-    } catch (err) {
+    } catch {
       throw HttpError.unauthorized("Invalid or expired token");
     }
 
