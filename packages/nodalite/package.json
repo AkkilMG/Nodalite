@@ -2,6 +2,10 @@
   "name": "nodalite",
   "version": "0.1.0",
   "license": "MIT",
+  "keywords": ["api", "framework", "router", "middleware", "serverless", "typescript", "runtime-agnostic", "node", "bun", "deno", "cloudflare", "lambda"],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AkkilMG/Nodalite.git",
@@ -10,11 +14,15 @@
   "bugs": {
     "url": "https://github.com/AkkilMG/Nodalite/issues"
   },
+  "homepage": "https://nodalite.akkil.dev",
   "description": "Runtime-agnostic TypeScript API framework — runs on Node, Lambda, Cloudflare Workers, Bun, Deno.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=18"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

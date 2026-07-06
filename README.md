@@ -1,5 +1,11 @@
 # Nodalite
 
+[![npm version](https://img.shields.io/npm/v/nodalite?color=blue&logo=npm)](https://www.npmjs.com/package/nodalite)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node >=18](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](package.json)
+[![CI](https://github.com/AkkilMG/Nodalite/actions/workflows/ci.yml/badge.svg)](https://github.com/AkkilMG/Nodalite/actions/workflows/ci.yml)
+[![npm downloads](https://img.shields.io/npm/dm/nodalite)](https://www.npmjs.com/package/nodalite)
+
 A small, runtime-agnostic TypeScript API framework: the same `App` instance
 runs unmodified on a Node server, AWS Lambda, and Cloudflare Workers, with
 built-in security middleware, an independent-background-thread pattern for
@@ -8,6 +14,22 @@ things like bots/pollers, and a serverless-aware ML inference runner.
 Read **[`docs/GUIDE.md`](./docs/GUIDE.md)** for the full architecture
 rationale, security checklist, deployment guide, and the complete
 build/test/publish playbook. This README is just the quick start.
+
+## Features
+
+- **Runtime-agnostic** — same `App` runs unmodified on Node, Bun, Deno, Cloudflare Workers, and AWS Lambda
+- **Zero-dependency core** — `@nodalite/core` has zero runtime dependencies
+- **Security middleware** — CORS, security headers, rate limiting, JWT auth
+- **Background workers** — `worker_threads` for bots, pollers, and CPU offload
+- **Scheduler** — cron/interval scheduling for long-running servers; serverless adapter too
+- **ML inference** — serverless-aware model runner with ONNX Runtime adapter
+- **CLI scaffolding** — interactive project generation via `npx create-nodalite`
+
+## Requirements
+
+- **Node.js >= 18** — required for built-in Fetch API, `worker_threads`, and `crypto.subtle`
+- Cloudflare Workers, Bun, and Deno work with `@nodalite/adapter-edge` or no adapter at all
+- `onnxruntime-node` is an optional peer dependency (only needed for ONNX ML inference)
 
 ## Installation
 
@@ -117,6 +139,8 @@ npm run build --workspaces --if-present  # build every package (tsup, ESM + CJS 
 npm test              # run every package's test suite (Vitest)
 npm run typecheck --workspaces --if-present  # tsc --noEmit across every package
 ```
+
+See **[`CONTRIBUTING.md`](./CONTRIBUTING.md)** and **[`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md)** before opening issues or PRs.
 
 Every package here is genuinely tested, not just typed: `adapter-node`'s
 tests start a real HTTP server and hit it with `fetch()`; `adapter-lambda`'s

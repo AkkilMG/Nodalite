@@ -2,6 +2,10 @@
   "name": "create-nodalite",
   "version": "0.1.0",
   "license": "MIT",
+  "keywords": ["scaffold", "cli", "generator", "template", "create-app"],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AkkilMG/Nodalite.git",
@@ -10,8 +14,12 @@
   "bugs": {
     "url": "https://github.com/AkkilMG/Nodalite/issues"
   },
-  "description": "Scaffold a new Nodalite project",
+  "homepage": "https://nodalite.akkil.dev",
+  "description": "Scaffold a new Nodalite project — interactive CLI to generate APIs, Telegram bots, Lambda functions, and edge workers.",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "bin": {
     "create-nodalite": "./dist/cli.js"
   },

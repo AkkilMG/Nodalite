@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "description": "Runtime-agnostic TypeScript API framework — runs on Node, Lambda, Cloudflare Workers, Bun, Deno.",
+  "keywords": ["monorepo", "api", "framework", "typescript", "runtime-agnostic", "serverless", "worker", "ml"],
   "license": "MIT",
   "author": "Akkil <me@akkil.dev>",
   "repository": {
@@ -16,12 +17,13 @@
   "engines": {
     "node": ">=18"
   },
-  "workspaces": ["packages/*", "examples/*"],
+  "workspaces": ["packages/*", "examples/*", "docs"],
   "scripts": {
+    "prepare": "npm run build --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
     "test": "vitest run",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint .",
     "changeset": "changeset",
     "release": "npm run build --workspaces --if-present && changeset publish",
     "dev:basic": "npm run dev -w examples-basic-api",
@@ -35,6 +37,9 @@
     "vitest": "^2.1.4",
     "vitepress": "^1.6.3",
     "@changesets/cli": "^2.27.0",
-    "@types/node": "^22.9.0"
+    "@types/node": "^22.9.0",
+    "eslint": "^9.15.0",
+    "@eslint/js": "^9.15.0",
+    "typescript-eslint": "^8.16.0"
   }
 }

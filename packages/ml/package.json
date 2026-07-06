@@ -2,6 +2,7 @@
   "name": "@nodalite/ml",
   "version": "0.1.0",
   "license": "MIT",
+  "keywords": ["ml-inference", "onnx", "model-serving", "serverless-ml", "machine-learning"],
   "publishConfig": {
     "access": "public"
   },
@@ -18,6 +19,9 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=18"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
