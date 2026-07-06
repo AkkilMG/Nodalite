@@ -33,26 +33,9 @@ hero:
       text: View on GitHub
       link: https://github.com/AkkilMG/nodalite
 
-features:
-  - icon: 🔀
-    title: Runtime-Agnostic
-    details: "Built on the standard Fetch API (Request/Response). Same code runs on Node, Bun, Deno, Lambda, and Cloudflare Workers — no adapter rewrites needed."
-  - icon: 🛡️
-    title: Security Built In
-    details: "CORS, security headers, rate limiting, JWT auth, request validation, and body size limits ship as first-party middleware."
-  - icon: ⚡
-    title: Zero Dependencies Core
-    details: "@nodalite/core has no runtime dependencies — only what the JS runtime already provides. Tree-shakeable, minimal bundle footprint."
-  - icon: 🧵
-    title: Background Threads
-    details: "runDetached() spawns supervised worker_threads for bots, pollers, or any long-lived background work alongside your API."
-  - icon: 🤖
-    title: ML Inference
-    details: "Cached, engine-agnostic model runner built for serverless cold starts. Works with ONNX or any custom inference engine."
-  - icon: 📦
-    title: Monorepo Design
-    details: "Independently versioned packages. Adapters don't bloat core. Install only what you need — no framework kitchen sink."
 ---
+
+<HomeFeatures />
 
 ## How the documentation is organized
 

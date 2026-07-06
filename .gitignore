@@ -46,3 +46,16 @@ Thumbs.db
 
 # np release artefacts
 .np-config.json
+
+# Build cache
+.tsup/
+
+# npm pack artefacts
+*.tgz
+
+# Temporary directories
+tmp/
+scratch/
+
+# Docs
+.vitepress/

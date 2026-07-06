@@ -5,12 +5,26 @@ runs unmodified on a Node server, AWS Lambda, and Cloudflare Workers, with
 built-in security middleware, an independent-background-thread pattern for
 things like bots/pollers, and a serverless-aware ML inference runner.
 
-> **Working name.** Rename before publishing — see
-> [`docs/GUIDE.md` §10](./docs/GUIDE.md#10-naming--rebranding).
-
 Read **[`docs/GUIDE.md`](./docs/GUIDE.md)** for the full architecture
 rationale, security checklist, deployment guide, and the complete
 build/test/publish playbook. This README is just the quick start.
+
+## Installation
+
+```bash
+npm install @nodalite/core
+```
+
+Or install adapters as needed:
+
+```bash
+npm install @nodalite/adapter-node    # Node.js server
+npm install @nodalite/adapter-lambda  # AWS Lambda
+npm install @nodalite/adapter-edge    # Cloudflare Workers
+npm install @nodalite/workers         # Background threads
+npm install @nodalite/scheduler       # Cron/interval scheduling
+npm install @nodalite/ml              # ML inference
+```
 
 ## Packages
 
@@ -96,4 +110,4 @@ testing philosophy.
 
 ## License
 
-MIT — set your own license/copyright before publishing.
+MIT

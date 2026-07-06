@@ -1,6 +1,18 @@
 {
   "name": "@nodalite/adapter-node",
   "version": "0.1.0",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkkilMG/Nodalite.git",
+    "directory": "packages/adapter-node"
+  },
+  "bugs": {
+    "url": "https://github.com/AkkilMG/Nodalite/issues"
+  },
   "description": "Run a Nodalite App on a plain Node.js http/https server.",
   "type": "module",
   "main": "./dist/index.cjs",

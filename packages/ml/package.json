@@ -1,6 +1,18 @@
 {
   "name": "@nodalite/ml",
   "version": "0.1.0",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkkilMG/Nodalite.git",
+    "directory": "packages/ml"
+  },
+  "bugs": {
+    "url": "https://github.com/AkkilMG/Nodalite/issues"
+  },
   "description": "Serverless-aware runner for lightweight ML models: caches model bytes to disk across cold starts, reuses the loaded session across warm invocations, and de-duplicates concurrent cold-start loads. Engine-agnostic (ships an optional ONNX Runtime adapter; bring your own for anything else).",
   "type": "module",
   "main": "./dist/index.cjs",

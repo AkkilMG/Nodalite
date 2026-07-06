@@ -1,0 +1,7 @@
+{
+  "access": "public",
+  "baseBranch": "main",
+  "changelog": "@changesets/cli/changelog",
+  "commit": true,
+  "updateInternalDependencies": "patch"
+}

@@ -2,6 +2,20 @@
   "name": "nodalite-monorepo",
   "private": true,
   "version": "0.1.0",
+  "description": "Runtime-agnostic TypeScript API framework — runs on Node, Lambda, Cloudflare Workers, Bun, Deno.",
+  "license": "MIT",
+  "author": "Akkil <me@akkil.dev>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkkilMG/Nodalite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AkkilMG/Nodalite/issues"
+  },
+  "homepage": "https://github.com/AkkilMG/Nodalite#readme",
+  "engines": {
+    "node": ">=18"
+  },
   "workspaces": ["packages/*", "examples/*"],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
@@ -20,6 +34,7 @@
     "tsup": "^8.3.5",
     "vitest": "^2.1.4",
     "vitepress": "^1.6.3",
+    "@changesets/cli": "^2.27.0",
     "@types/node": "^22.9.0"
   }
 }

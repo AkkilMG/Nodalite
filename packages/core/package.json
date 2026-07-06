@@ -1,6 +1,18 @@
 {
   "name": "@nodalite/core",
   "version": "0.1.0",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkkilMG/Nodalite.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/AkkilMG/Nodalite/issues"
+  },
   "description": "Tiny, runtime-agnostic router + context + middleware engine for Nodalite. Built on the standard Fetch Request/Response API so it works identically on Node, Bun, Deno, Workers and Lambda.",
   "type": "module",
   "main": "./dist/index.cjs",
