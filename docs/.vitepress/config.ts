@@ -1,13 +1,16 @@
 import { defineConfig } from "vitepress";
 
+const base = process.env.CUSTOM_DOMAIN ? "/" : "/Nodalite/";
+
 export default defineConfig({
+  base,
   title: "Nodalite",
   description: "Runtime-agnostic TypeScript API framework for Node, Bun, Deno, Cloudflare Workers, and AWS Lambda.",
   cleanUrls: true,
   lastUpdated: true,
 
   head: [
-    ["link", { rel: "icon", href: "/favicon.ico" }],
+    ["link", { rel: "icon", href: `${base}favicon.ico` }],
   ],
 
   themeConfig: {
