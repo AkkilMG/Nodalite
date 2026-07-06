@@ -25,7 +25,7 @@ type LambdaHandler = (event: LambdaEvent, context: Context) => Promise<LambdaRes
  * export const handler = createLambdaHandler(app);
  * ```
  */
-declare function createLambdaHandler(app: App<any>, opts?: LambdaAdapterOptions): LambdaHandler;
+declare function createLambdaHandler(app: App, opts?: LambdaAdapterOptions): LambdaHandler;
 
 declare function v1EventToRequest(event: APIGatewayProxyEvent): Request;
 declare function responseToV1Result(response: Response): Promise<APIGatewayProxyResult>;

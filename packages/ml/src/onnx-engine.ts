@@ -26,7 +26,7 @@ export function onnxEngine(opts: OnnxEngineOptions = {}): InferenceEngine<OnnxIn
       });
       return {
         async run(input: OnnxInput) {
-          return session.run(input as any) as unknown as OnnxOutput;
+          return session.run(input as unknown as Parameters<typeof session.run>[0]) as unknown as OnnxOutput;
         },
         async release() {
           await session.release();

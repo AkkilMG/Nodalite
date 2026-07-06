@@ -13,7 +13,7 @@
     "@nodalite/adapter-lambda": "*"
   },
   "devDependencies": {
-    "esbuild": "^0.24.0",
-    "typescript": "^5.6.3"
+    "esbuild": "^0.28.0",
+    "typescript": "^6.0.0"
   }
 }

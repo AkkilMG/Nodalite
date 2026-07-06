@@ -23,7 +23,7 @@ export interface ServeHandle {
  * for edge runtimes (Bun/Deno/Cloudflare Workers) just export `app.fetch`
  * directly since they already speak the standard Fetch API.
  */
-export function serve(app: App<any>, opts: ServeOptions = {}): ServeHandle {
+export function serve(app: App, opts: ServeOptions = {}): ServeHandle {
   const port = opts.port ?? (Number(process.env.PORT) || 3000);
   const hostname = opts.hostname ?? "0.0.0.0";
 

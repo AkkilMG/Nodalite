@@ -24,7 +24,7 @@ interface ServeHandle {
  * for edge runtimes (Bun/Deno/Cloudflare Workers) just export `app.fetch`
  * directly since they already speak the standard Fetch API.
  */
-declare function serve(app: App<any>, opts?: ServeOptions): ServeHandle;
+declare function serve(app: App, opts?: ServeOptions): ServeHandle;
 
 declare function toFetchRequest(req: IncomingMessage, opts?: {
     https?: boolean;

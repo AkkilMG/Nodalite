@@ -38,11 +38,11 @@
   },
   "dependencies": {
     "@nodalite/core": "*",
-    "jose": "^5.9.6"
+    "jose": "^6.0.0"
   },
   "devDependencies": {
-    "tsup": "^8.3.5",
-    "typescript": "^5.6.3",
-    "vitest": "^2.1.4"
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.0",
+    "vitest": "^4.0.0"
   }
 }

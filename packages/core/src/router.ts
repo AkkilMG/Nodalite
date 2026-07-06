@@ -1,15 +1,15 @@
 import type { Handler, HttpMethod, Middleware, RouteMatch } from "./types.js";
 
-interface Node {
-  static: Map<string, Node>;
+interface Node<Env extends Record<string, unknown>> {
+  static: Map<string, Node<Env>>;
   paramName?: string;
-  paramChild?: Node;
-  wildcardChild?: Node;
-  handlers: Map<HttpMethod, Handler<any>>;
-  middlewares: Middleware<any>[];
+  paramChild?: Node<Env>;
+  wildcardChild?: Node<Env>;
+  handlers: Map<HttpMethod, Handler<Env>>;
+  middlewares: Middleware<Env>[];
 }
 
-function createNode(): Node {
+function createNode<Env extends Record<string, unknown>>(): Node<Env> {
   return { static: new Map(), handlers: new Map(), middlewares: [] };
 }
 
@@ -23,23 +23,23 @@ function createNode(): Node {
  * routing cost flat and predictable even with thousands of routes — matters
  * on cold starts where every millisecond of setup/lookup counts.
  */
-export class Router {
-  private root: Node = createNode();
+export class Router<Env extends Record<string, unknown> = Record<string, unknown>> {
+  private root: Node<Env> = createNode<Env>();
 
-  add(method: HttpMethod, path: string, handler: Handler<any>, middlewares: Middleware<any>[] = []): void {
+  add(method: HttpMethod, path: string, handler: Handler<Env>, middlewares: Middleware<Env>[] = []): void {
     const segments = splitPath(path);
     let node = this.root;
 
     for (const segment of segments) {
       if (segment === "*") {
-        node.wildcardChild ??= createNode();
+        node.wildcardChild ??= createNode<Env>();
         node = node.wildcardChild;
       } else if (segment.startsWith(":")) {
-        node.paramChild ??= createNode();
+        node.paramChild ??= createNode<Env>();
         node.paramName = segment.slice(1);
         node = node.paramChild;
       } else {
-        if (!node.static.has(segment)) node.static.set(segment, createNode());
+        if (!node.static.has(segment)) node.static.set(segment, createNode<Env>());
         node = node.static.get(segment)!;
       }
     }
@@ -48,7 +48,7 @@ export class Router {
     node.middlewares = middlewares;
   }
 
-  match(method: HttpMethod, path: string): RouteMatch | null {
+  match(method: HttpMethod, path: string): RouteMatch<Env> | null {
     const segments = splitPath(path);
     const params: Record<string, string> = {};
     const node = this.walk(this.root, segments, 0, params);
@@ -60,7 +60,7 @@ export class Router {
     return { handler, params, middlewares: node.middlewares };
   }
 
-  private walk(node: Node, segments: string[], i: number, params: Record<string, string>): Node | null {
+  private walk(node: Node<Env>, segments: string[], i: number, params: Record<string, string>): Node<Env> | null {
     if (i === segments.length) return node.handlers.size > 0 ? node : null;
 
     const segment = segments[i]!;

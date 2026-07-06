@@ -36,7 +36,7 @@ export async function sendResponse(res: ServerResponse, response: Response): Pro
     return;
   }
 
-  const nodeStream = Readable.fromWeb(response.body as any);
+  const nodeStream = Readable.fromWeb(response.body as ReadableStream<Uint8Array>);
   await new Promise<void>((resolve, reject) => {
     nodeStream.pipe(res);
     nodeStream.on("end", resolve);

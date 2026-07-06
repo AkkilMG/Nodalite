@@ -27,7 +27,7 @@ export interface AppOptions {
  * Cloudflare Worker.
  */
 export class App<Env extends Record<string, unknown> = Record<string, unknown>> {
-  private router = new Router();
+  private router = new Router<Env>();
   private globalMiddlewares: UseEntry<Env>[] = [];
   private errorHandler?: ErrorHandler<Env>;
   private notFoundHandler?: Handler<Env>;

@@ -22,8 +22,8 @@ export type Handler<Env extends Record<string, unknown> = Record<string, unknown
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS" | "ALL";
 
-export interface RouteMatch {
-  handler: Handler<any>;
+export interface RouteMatch<Env extends Record<string, unknown> = Record<string, unknown>> {
+  handler: Handler<Env>;
   params: Record<string, string>;
-  middlewares: Middleware<any>[];
+  middlewares: Middleware<Env>[];
 }

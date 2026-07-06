@@ -23,7 +23,7 @@ import type { App } from "@nodalite/core";
  * Bun.serve({ fetch: (req) => app.fetch(req) });
  * ```
  */
-export function createEdgeHandler(app: App<any>) {
+export function createEdgeHandler(app: App) {
   return {
     fetch(request: Request, env?: Record<string, unknown>, ctx?: { waitUntil(p: Promise<unknown>): void }): Promise<Response> {
       return app.handle(request, { runtime: "edge", env, waitUntil: ctx?.waitUntil?.bind(ctx) });

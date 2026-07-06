@@ -47,9 +47,9 @@ describe("createLambdaHandler", () => {
     app.get("/health", (c) => c.json({ ok: true, ip: c.platform.ip }));
     const handler = createLambdaHandler(app);
 
-    const result: any = await handler(v2Event(), fakeLambdaContext());
+    const result = await handler(v2Event(), fakeLambdaContext());
     expect(result.statusCode).toBe(200);
-    const body = JSON.parse(Buffer.from(result.body, "base64").toString("utf8"));
+    const body = JSON.parse(Buffer.from(result.body!, "base64").toString("utf8"));
     expect(body).toEqual({ ok: true, ip: "203.0.113.5" });
   });
 
@@ -64,13 +64,13 @@ describe("createLambdaHandler", () => {
       requestContext: {
         http: { method: "POST", path: "/echo", sourceIp: "203.0.113.5" },
         domainName: "abc123.execute-api.us-east-1.amazonaws.com",
-      } as any,
+      } as unknown as APIGatewayProxyEventV2["requestContext"],
       headers: { host: "abc123.execute-api.us-east-1.amazonaws.com", "content-type": "application/json" },
       body: payload,
     });
 
-    const result: any = await handler(event, fakeLambdaContext());
-    const body = JSON.parse(Buffer.from(result.body, "base64").toString("utf8"));
+    const result = await handler(event, fakeLambdaContext());
+    const body = JSON.parse(Buffer.from(result.body!, "base64").toString("utf8"));
     expect(body).toEqual({ hello: "world" });
   });
 
@@ -79,9 +79,9 @@ describe("createLambdaHandler", () => {
     app.get("/health", (c) => c.json({ ok: true, ip: c.platform.ip }));
     const handler = createLambdaHandler(app);
 
-    const result: any = await handler(v1Event(), fakeLambdaContext());
+    const result = await handler(v1Event(), fakeLambdaContext());
     expect(result.statusCode).toBe(200);
-    const body = JSON.parse(Buffer.from(result.body, "base64").toString("utf8"));
+    const body = JSON.parse(Buffer.from(result.body!, "base64").toString("utf8"));
     expect(body).toEqual({ ok: true, ip: "198.51.100.2" });
   });
 

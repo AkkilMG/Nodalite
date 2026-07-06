@@ -37,7 +37,7 @@ describe("Model", () => {
 
     const [a, b, c] = await Promise.all([model.predict({ x: 1 }), model.predict({ x: 2 }), model.predict({ x: 3 })]);
     expect(loadCount.n).toBe(1);
-    expect([a, b, c].map((r: any) => r.y)).toEqual([2, 4, 6]);
+    expect([a, b, c].map((r: { y: number }) => r.y)).toEqual([2, 4, 6]);
   });
 
   it("warm() pre-loads the session ahead of the first request", async () => {

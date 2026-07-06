@@ -84,10 +84,10 @@ type Middleware<Env extends Record<string, unknown> = Record<string, unknown>> =
 /** A terminal route handler. Distinguished from Middleware only by convention (it usually doesn't call next). */
 type Handler<Env extends Record<string, unknown> = Record<string, unknown>> = (c: Context<Env>) => Promise<Response> | Response;
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS" | "ALL";
-interface RouteMatch {
-    handler: Handler<any>;
+interface RouteMatch<Env extends Record<string, unknown> = Record<string, unknown>> {
+    handler: Handler<Env>;
     params: Record<string, string>;
-    middlewares: Middleware<any>[];
+    middlewares: Middleware<Env>[];
 }
 
 type ErrorHandler<Env extends Record<string, unknown>> = (err: unknown, c: Context<Env>) => Promise<Response> | Response;
@@ -184,10 +184,10 @@ declare function isHttpError(err: unknown): err is HttpError;
  * routing cost flat and predictable even with thousands of routes — matters
  * on cold starts where every millisecond of setup/lookup counts.
  */
-declare class Router {
+declare class Router<Env extends Record<string, unknown> = Record<string, unknown>> {
     private root;
-    add(method: HttpMethod, path: string, handler: Handler<any>, middlewares?: Middleware<any>[]): void;
-    match(method: HttpMethod, path: string): RouteMatch | null;
+    add(method: HttpMethod, path: string, handler: Handler<Env>, middlewares?: Middleware<Env>[]): void;
+    match(method: HttpMethod, path: string): RouteMatch<Env> | null;
     private walk;
 }
 

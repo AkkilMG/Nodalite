@@ -9,7 +9,7 @@ export interface DetachedOptions {
   restartDelayMs?: number;
   maxRestartDelayMs?: number;
   onExit?: (code: number) => void;
-  onError?: (err: Error) => void;
+  onError?: (err: unknown) => void;
 }
 
 export interface DetachedHandle {

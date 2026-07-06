@@ -57,7 +57,7 @@ export function validate<Env extends Record<string, unknown>>(schemas: ValidateS
   };
 }
 
-async function safeJson(c: Context<any>): Promise<unknown> {
+async function safeJson(c: Context): Promise<unknown> {
   try {
     return await c.req.json();
   } catch {

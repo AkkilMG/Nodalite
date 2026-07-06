@@ -40,7 +40,7 @@ export type LambdaHandler = (event: LambdaEvent, context: LambdaContext) => Prom
  * export const handler = createLambdaHandler(app);
  * ```
  */
-export function createLambdaHandler(app: App<any>, opts: LambdaAdapterOptions = {}): LambdaHandler {
+export function createLambdaHandler(app: App, opts: LambdaAdapterOptions = {}): LambdaHandler {
   let coldStartPromise: Promise<void> | undefined;
 
   return async function handler(event: LambdaEvent, context: LambdaContext): Promise<LambdaResult> {

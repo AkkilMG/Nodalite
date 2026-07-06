@@ -8,6 +8,10 @@ dist/
 coverage/
 .nyc_output/
 
+# Local
+/resources
+.npmrc
+
 # TypeScript incremental build info
 *.tsbuildinfo
 
