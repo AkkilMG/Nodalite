@@ -13,7 +13,7 @@ export class OpenAPIApp<Env extends Record<string, unknown> = Record<string, unk
     this.options = options;
 
     const specPath = options.specPath ?? "/openapi.json";
-    const docsPath = options.docsPath ?? "/docs";
+    const docsPath = options.docsPath ?? "/swagger";
     const redocPath = options.redocPath ?? "/redoc";
     const title = options.info.title;
 
@@ -35,6 +35,10 @@ export class OpenAPIApp<Env extends Record<string, unknown> = Record<string, unk
         headers: { "content-type": "text/html; charset=utf-8" },
       });
     });
+
+    this.app.reserve(specPath);
+    this.app.reserve(docsPath);
+    this.app.reserve(redocPath);
   }
 
   get(path: string, handler: Handler<Env>, opts?: RouteOptions<Env>): this {

@@ -11,42 +11,53 @@ npm install @nodalite/ml
 The core class. Loads, caches, and runs inference with any engine.
 
 ```ts
-import { Model } from '@nodalite/ml';
+import { Model, onnxEngine } from '@nodalite/ml';
 
-const model = new Model({
-  source: {
-    url: 'https://models.example.com/sentiment.onnx',
-  },
-  engine: onnxEngine(),
-});
+const model = new Model(
+  { type: 'url', url: 'https://models.example.com/sentiment.onnx' },
+  onnxEngine(),
+);
 
 // Warm up during cold start (Lambda onColdStart hook)
 await model.warm();
 
 // Run inference
-const result = await model.run({ text: 'I love this!' });
+const result = await model.predict({ text: 'I love this!' });
 ```
 
 ### Options
 
-| Option | Type | Description |
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `source` | `ModelSource` | — | Model source: `{ type: 'file', path }`, `{ type: 'url', url }`, or `{ type: 'buffer', bytes }` |
+| `engine` | `InferenceEngine` | — | The engine that runs inference |
+| `cacheDir` | `string` | `os.tmpdir()/nodalite-models` | Disk cache directory for URL-sourced models |
+| `maxBytes` | `number` | `52428800` (50 MB) | Max model size in bytes. Set to `0` to disable |
+| `allowedExtensions` | `string[]` | `['.onnx', '.bin', '.model']` | Allowed file extensions for file/URL sources |
+| `projectRoot` | `string` | `process.cwd()` | Root directory for path traversal protection |
+
+#### ModelSource
+
+| Source | Shape | Description |
 |---|---|---|
-| `source` | `ModelSource` | Model source (URL or local path) |
-| `engine` | `InferenceEngine` | The engine that runs inference |
-| `cacheKey` | `string` | Custom cache key (default: hash of URL) |
+| `file` | `{ type: 'file', path: string, projectRoot?: string }` | Local file. `path` is relative to `projectRoot` |
+| `url` | `{ type: 'url', url: string, headers?: Record<string, string> }` | Remote file. Cached to disk after first download |
+| `buffer` | `{ type: 'buffer', bytes: Buffer }` | In-memory bytes. No I/O |
 
 ### Methods
 
 | Method | Description |
 |---|---|
 | `warm()` | Pre-load the model (call during cold start) |
-| `run(input)` | Run inference. Returns engine-specific output |
+| `predict(input)` | Run inference. Returns engine-specific output |
+| `release()` | Free the loaded session. Next `predict()` triggers a reload |
 
 ### How caching works
 
 1. **Disk caching** — Model bytes downloaded from a URL are cached to
    `os.tmpdir()` (`/tmp` on Lambda), keyed by a hash of the source URL.
    Subsequent invocations on the same warm container read from disk instantly.
+   `file` and `buffer` sources skip this layer (the data is already local).
 2. **Session caching** — The constructed inference session is kept in memory
    on the `Model` instance. Warm invocations reuse the loaded session.
 3. **Cold-start dedup** — If multiple requests hit a cold container
@@ -61,7 +72,7 @@ The built-in ONNX Runtime engine adapter.
 import { onnxEngine } from '@nodalite/ml';
 
 const engine = onnxEngine({
-  executionProvider: 'cpu',  // or 'webgpu', 'wasm'
+  executionProviders: ['cpu'],
 });
 ```
 
@@ -78,7 +89,34 @@ The ONNX runtime is a ~270MB native binary. It is imported lazily via dynamic
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `executionProvider` | `string` | `'cpu'` | ONNX execution provider |
+| `executionProviders` | `string[]` | onnxruntime-node default | ONNX execution providers (e.g. `['cpu']`, `['cuda', 'cpu']`) |
+
+## Error classes
+
+All errors extend the base `ModelError` class with a `code` property for programmatic handling.
+
+```ts
+import { ModelSizeError, ModelPathError, ModelFormatError } from '@nodalite/ml';
+
+try {
+  await model.warm();
+} catch (err) {
+  if (err instanceof ModelSizeError) {
+    console.error('Model too large:', err.code); // 'MODEL_TOO_LARGE'
+  } else if (err instanceof ModelPathError) {
+    console.error('Path traversal blocked:', err.code); // 'MODEL_PATH_TRAVERSAL'
+  } else if (err instanceof ModelFormatError) {
+    console.error('Invalid format:', err.code); // 'MODEL_INVALID_FORMAT'
+  }
+}
+```
+
+| Class | Code | When |
+|---|---|---|
+| `ModelError` | — | Base class for all model errors |
+| `ModelSizeError` | `MODEL_TOO_LARGE` | Model bytes exceed `maxBytes` |
+| `ModelPathError` | `MODEL_PATH_TRAVERSAL` | File path resolves outside `projectRoot` |
+| `ModelFormatError` | `MODEL_INVALID_FORMAT` | Extension not allowed or ONNX magic bytes mismatch |
 
 ## Custom InferenceEngine
 
@@ -88,7 +126,7 @@ You don't have to use ONNX. Implement the two-method interface:
 import type { InferenceEngine, InferenceSession } from '@nodalite/ml';
 
 const myEngine: InferenceEngine = {
-  async load(modelBytes: Uint8Array): Promise<InferenceSession> {
+  async loadSession(modelBytes: Buffer): Promise<InferenceSession> {
     // Parse model bytes, return a session
     return {
       async run(input: Record<string, unknown>): Promise<unknown> {

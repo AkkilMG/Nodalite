@@ -11,9 +11,23 @@ export interface RateLimitStore {
  * memory, so limits won't be enforced globally across concurrent function
  * invocations. For serverless/multi-instance deployments, implement
  * `RateLimitStore` against Redis, Upstash, DynamoDB, etc. — it's one method.
+ *
+ * Includes automatic periodic cleanup of expired entries to prevent
+ * unbounded memory growth. Call `destroy()` on graceful shutdown to
+ * release the timer.
  */
 export class MemoryRateLimitStore implements RateLimitStore {
   private hits = new Map<string, { count: number; resetAt: number }>();
+  private cleanupTimer?: ReturnType<typeof setInterval>;
+
+  constructor(opts?: { cleanupIntervalMs?: number }) {
+    // Periodic cleanup of expired entries — default every 60s
+    const interval = opts?.cleanupIntervalMs ?? 60_000;
+    if (interval > 0) {
+      this.cleanupTimer = setInterval(() => this.cleanup(), interval);
+      this.cleanupTimer.unref?.();
+    }
+  }
 
   async increment(key: string, windowMs: number) {
     const now = Date.now();
@@ -25,6 +39,23 @@ export class MemoryRateLimitStore implements RateLimitStore {
     }
     existing.count += 1;
     return { count: existing.count, resetMs: existing.resetAt - now };
+  }
+
+  /** Clean up expired entries to free memory. Called automatically on interval. */
+  private cleanup() {
+    const now = Date.now();
+    for (const [key, entry] of this.hits) {
+      if (entry.resetAt <= now) this.hits.delete(key);
+    }
+  }
+
+  /** Release resources. Call this on graceful shutdown. */
+  destroy() {
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = undefined;
+    }
+    this.hits.clear();
   }
 }
 

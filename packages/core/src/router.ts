@@ -25,8 +25,26 @@ function createNode<Env extends Record<string, unknown>>(): Node<Env> {
  */
 export class Router<Env extends Record<string, unknown> = Record<string, unknown>> {
   private root: Node<Env> = createNode<Env>();
+  private reservedPaths = new Set<string>();
+
+  reserve(path: string): void {
+    this.reservedPaths.add(normalizeReservePath(path));
+  }
+
+  isReserved(path: string): boolean {
+    return this.reservedPaths.has(normalizeReservePath(path));
+  }
 
   add(method: HttpMethod, path: string, handler: Handler<Env>, middlewares: Middleware<Env>[] = []): void {
+    if (this.isReserved(path)) {
+      const suggestion = suggestAlternative(path, this.reservedPaths);
+      console.warn(
+        `[Nodalite] Route "${method} ${path}" is reserved and cannot be overridden. ` +
+          `Please use a different path (e.g. "${suggestion}").`
+      );
+      return;
+    }
+
     const segments = splitPath(path);
     let node = this.root;
 
@@ -90,4 +108,17 @@ export class Router<Env extends Record<string, unknown> = Record<string, unknown
 function splitPath(path: string): string[] {
   const trimmed = path.split("?")[0]!.replace(/^\/+|\/+$/g, "");
   return trimmed.length === 0 ? [] : trimmed.split("/");
+}
+
+function normalizeReservePath(path: string): string {
+  return path.split("?")[0]!.replace(/\/+$/, "") || "/";
+}
+
+function suggestAlternative(basePath: string, reserved: Set<string>): string {
+  const stripped = basePath.replace(/-\d+$/, "");
+  for (let i = 1; i < 100; i++) {
+    const candidate = `${stripped}-${i}`;
+    if (!reserved.has(candidate)) return candidate;
+  }
+  return `${stripped}-100`;
 }

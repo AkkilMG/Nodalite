@@ -17,7 +17,7 @@ export interface CorsOptions {
  * silently defaulting to `*`.
  */
 export function cors(opts: CorsOptions = {}): Middleware {
-  const methods = opts.methods ?? ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"];
+  const methods = opts.methods ?? ["GET", "POST", "PUT", "PATCH", "DELETE", "QUERY", "OPTIONS"];
 
   return async (c, next) => {
     const requestOrigin = c.req.header("origin");

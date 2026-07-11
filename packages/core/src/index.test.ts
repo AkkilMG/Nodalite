@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { App, HttpError } from "./index.js";
+import { describe, expect, it, vi } from "vitest";
+import { App, HttpError, validate } from "./index.js";
 
 function req(path: string, init?: RequestInit) {
   return new Request(`http://localhost${path}`, init);
@@ -130,5 +130,112 @@ describe("route groups", () => {
     const res = await app.handle(req("/api/v1/ping"));
     expect(await res.json()).toEqual({ pong: true });
     expect(res.headers.get("x-api-version")).toBe("1");
+  });
+});
+
+describe("QUERY method (RFC 10008)", () => {
+  it("matches a QUERY route and returns data", async () => {
+    const app = new App();
+    app.query("/search", (c) => c.json({ results: [] }));
+    const res = await app.handle(req("/search", { method: "QUERY" }));
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ results: [] });
+  });
+
+  it("accepts a JSON body on QUERY requests", async () => {
+    const app = new App();
+    app.query("/search", async (c) => {
+      const body = await c.req.json<{ filter: string }>();
+      return c.json({ query: body.filter });
+    });
+    const res = await app.handle(
+      req("/search", {
+        method: "QUERY",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ filter: "laptops" }),
+      })
+    );
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ query: "laptops" });
+  });
+
+  it("works with validate middleware", async () => {
+    const failingSchema = {
+      "~standard": {
+        validate: () => ({ issues: [{ message: "q is required" }] }),
+      },
+    };
+    const app = new App();
+    app.query(
+      "/search",
+      async (c) => {
+        const body = await c.req.json<{ q: string }>();
+        return c.json({ found: body.q });
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      [validate({ body: failingSchema as any })]
+    );
+    const res = await app.handle(
+      req("/search", {
+        method: "QUERY",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({}),
+      })
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("QUERY does not match GET routes", async () => {
+    const app = new App();
+    app.get("/data", (c) => c.json({ via: "get" }));
+    const res = await app.handle(req("/data", { method: "QUERY" }));
+    expect(res.status).toBe(404);
+  });
+});
+
+describe("reserved routes", () => {
+  it("reserve() marks a path as reserved", () => {
+    const app = new App();
+    app.reserve("/admin");
+    expect(app.isReserved("/admin")).toBe(true);
+  });
+
+  it("isReserved() returns false for unreserved paths", () => {
+    const app = new App();
+    expect(app.isReserved("/admin")).toBe(false);
+  });
+
+  it("overriding a reserved path warns and original handler stays", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const app = new App();
+    app.get("/secret", () => new Response("original"));
+    app.reserve("/secret");
+    app.get("/secret", () => new Response("override"));
+
+    const res = await app.handle(req("/secret"));
+    expect(await res.text()).toBe("original");
+    expect(warnSpy).toHaveBeenCalledOnce();
+    expect(warnSpy.mock.calls[0]![0]).toContain("reserved");
+    warnSpy.mockRestore();
+  });
+
+  it("warn message suggests an alternative path", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const app = new App();
+    app.reserve("/swagger");
+    app.get("/swagger", () => new Response("nope"));
+
+    const msg = warnSpy.mock.calls[0]![0] as string;
+    expect(msg).toContain("/swagger-1");
+    warnSpy.mockRestore();
+  });
+
+  it("non-reserved paths register normally", async () => {
+    const app = new App();
+    app.reserve("/other");
+    app.get("/normal", () => new Response("ok"));
+
+    const res = await app.handle(req("/normal"));
+    expect(await res.text()).toBe("ok");
   });
 });

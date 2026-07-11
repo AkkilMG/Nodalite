@@ -25,7 +25,7 @@ SwaggerUIBundle({
   showExtensions: true,
   showCommonExtensions: true,
 });
-<\/script>
+</` + `script>
 </body>
 </html>`;
 }
@@ -46,7 +46,7 @@ export function redocHTML(specURL: string, title: string): string {
 <script src="https://unpkg.com/redoc@latest/bundles/redoc.standalone.js" crossorigin></script>
 <script>
 Redoc.init(${JSON.stringify(specURL)}, { scrollYOffset: 0 }, document.getElementById("redoc-container"));
-<\/script>
+</` + `script>
 </body>
 </html>`;
 }

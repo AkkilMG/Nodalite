@@ -20,7 +20,7 @@ export type Handler<Env extends Record<string, unknown> = Record<string, unknown
   c: Context<Env>
 ) => Promise<Response> | Response;
 
-export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS" | "ALL";
+export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS" | "QUERY" | "ALL";
 
 export interface RouteMatch<Env extends Record<string, unknown> = Record<string, unknown>> {
   handler: Handler<Env>;

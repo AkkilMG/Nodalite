@@ -60,6 +60,9 @@ export class App<Env extends Record<string, unknown> = Record<string, unknown>> 
   delete(path: string, handler: Handler<Env>, middlewares: Middleware<Env>[] = []): this {
     return this.on("DELETE", path, handler, middlewares);
   }
+  query(path: string, handler: Handler<Env>, middlewares: Middleware<Env>[] = []): this {
+    return this.on("QUERY", path, handler, middlewares);
+  }
   all(path: string, handler: Handler<Env>, middlewares: Middleware<Env>[] = []): this {
     return this.on("ALL", path, handler, middlewares);
   }
@@ -73,6 +76,17 @@ export class App<Env extends Record<string, unknown> = Record<string, unknown>> 
   group(prefix: string, build: (group: RouteGroup<Env>) => void): this {
     build(new RouteGroup(this, prefix));
     return this;
+  }
+
+  /** Mark a path as reserved so it cannot be overridden by later route registrations. */
+  reserve(path: string): this {
+    this.router.reserve(path);
+    return this;
+  }
+
+  /** Check whether a path is currently reserved. */
+  isReserved(path: string): boolean {
+    return this.router.isReserved(path);
   }
 
   onError(handler: ErrorHandler<Env>): this {
@@ -165,6 +179,10 @@ export class RouteGroup<Env extends Record<string, unknown>> {
   }
   delete(path: string, handler: Handler<Env>, mw: Middleware<Env>[] = []): this {
     this.app.delete(joinPath(this.prefix, path), handler, mw);
+    return this;
+  }
+  query(path: string, handler: Handler<Env>, mw: Middleware<Env>[] = []): this {
+    this.app.query(joinPath(this.prefix, path), handler, mw);
     return this;
   }
 }

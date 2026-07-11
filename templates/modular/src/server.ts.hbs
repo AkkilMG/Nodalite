@@ -1,0 +1,16 @@
+import { serve } from "@nodalite/adapter-node";
+import { app } from "./app.js";
+
+const port = Number(process.env.PORT) || 3000;
+const handle = serve(app, { port });
+
+process.on("SIGINT", async () => {
+  console.log("\nShutting down...");
+  await handle.close();
+  process.exit(0);
+});
+
+process.on("SIGTERM", async () => {
+  await handle.close();
+  process.exit(0);
+});

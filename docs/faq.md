@@ -27,6 +27,20 @@ Yes. The `jwtAuth`/`signJwt` middleware is a convenience, not a requirement.
 You can use Passport.js, Auth0, Clerk, or any custom auth system — just handle
 it in your own middleware.
 
+## How does `@nodalite/ml` protect against malicious model files?
+
+`Model` enforces three safety checks by default when loading local files or
+URLs:
+
+1. **Path traversal protection** — resolved file paths must stay inside
+   `projectRoot` (default: `process.cwd()`).
+2. **Size limits** — models are capped at 50 MB by default (`maxBytes`).
+3. **Format validation** — only `.onnx`, `.bin`, and `.model` extensions are
+   allowed; `.onnx` files are verified against the ONNX magic bytes.
+
+Override or disable any of these via `ModelOptions`. See
+[ML Inference](/guides/ml-inference) for details.
+
 ## Does Nodalite work with TypeScript?
 
 Yes. Every package ships with `.d.ts` files. The `App` and `Context` classes
@@ -51,6 +65,76 @@ half-support onto the HTTP-shaped core.
   `tsyringe` or `awilix` if you need more
 - **No OpenAPI generation** — addable later via `zod-to-openapi`
 - **No WebSocket support** — planned as a separate package
+
+## What is the QUERY method?
+
+`QUERY` ([RFC 10008](https://datatracker.ietf.org/doc/html/rfc10008)) is an
+HTTP method that is **safe and idempotent** like `GET`, but also accepts a
+request body. It's useful for search or filter operations where the query is
+too complex for URL parameters:
+
+```ts
+app.query('/search', async (c) => {
+  const { filters, sort, pagination } = await c.req.json();
+  const results = await db.search(filters, sort, pagination);
+  return c.json({ results });
+});
+```
+
+Use `QUERY` when the operation should never cause side effects but needs a
+structured body. Use `POST` when the operation creates or modifies resources.
+
+## When should I use auto-discovery?
+
+Use `discover()` when your project has many route files and you want to avoid
+manually importing each one. It scans a directory, imports every route file,
+and registers them automatically — subdirectories become route groups with
+prefix detection via `_prefix.ts` files.
+
+It's a good fit for medium-to-large APIs with dozens of route files. For small
+projects with a handful of routes, explicit imports in `app.ts` are simpler and
+more transparent.
+
+Auto-discovery uses dynamic `import()` and works on Node, Bun, and Deno. It's
+**not suitable for bundled edge runtimes** (Cloudflare Workers) — use static
+imports there.
+
+## Are the in-memory stores production-ready?
+
+No. `MemoryRateLimitStore`, `MemoryApiKeyStore`, and `MemorySessionStore` are
+single-process only — each instance has its own isolated memory. They're
+intended for development and testing.
+
+For production, implement the corresponding store interface against a shared
+datastore:
+
+| Store | Interface | Production options |
+|---|---|---|
+| Rate limiting | `RateLimitStore` | Redis, Upstash, DynamoDB |
+| API keys | `ApiKeyStore` | Redis, Postgres, DynamoDB |
+| Sessions | `SessionStore` | Redis, DynamoDB, Postgres |
+
+All memory stores include cleanup timers and `destroy()` methods to prevent
+leaks in long-running processes.
+
+## Which security middleware do I need?
+
+| Threat | Middleware | When to use |
+|---|---|---|
+| CSRF | `csrf()` | Browser-facing forms or cookie-based auth |
+| XSS (stored) | `xssSanitize()` | User content rendered as HTML later |
+| SSRF | `ssrfGuard()` | Routes that fetch user-supplied URLs |
+| Brute force | `rateLimit()` | Any public endpoint |
+| Unauthorized access | `jwtAuth()` or `apiKey()` | Protecting API routes |
+| IP abuse | `ipGuard()` | Admin panels, geo-restricted APIs |
+| Wrong content type | `contentTypeGuard()` | API endpoints expecting specific payloads |
+| Hanging requests | `requestTimeout()` | Slow backends, external API calls |
+| Session hijacking | `sessions()` | Cookie-based auth (alternative to JWT) |
+| Missing trace context | `requestId()` | Distributed systems, log correlation |
+
+Not every API needs all of them. Start with `rateLimit`, `cors`,
+`securityHeaders`, and `bodyLimit` — add the rest as your threat model
+requires.
 
 ## Can I contribute?
 

@@ -1,0 +1,10 @@
+import type { App } from "nodalite";
+
+export default (app: App) => {
+  app.get("/items", (c) => c.json({ items: [] }));
+
+  app.post("/items", async (c) => {
+    const body = await c.req.json<{ name: string }>();
+    return c.status(201).json({ id: "new", name: body.name });
+  });
+};

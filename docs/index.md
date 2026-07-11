@@ -57,7 +57,7 @@ hero:
 ### API Reference
 
 - [@nodalite/core](/api/core) — App, Context, Router
-- [@nodalite/middleware](/api/middleware) — security, validation
+- [@nodalite/middleware](/api/middleware) — security, sessions, CORS
 - [Adapters](/api/) — Node, Lambda, Edge
 - [Workers & Scheduler](/api/workers) — background tasks
 

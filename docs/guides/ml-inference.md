@@ -38,6 +38,61 @@ const handler = createLambdaHandler(app, {
 });
 ```
 
+## Local file models
+
+Place a model file (`.onnx`, `.bin`, or `.model`) in your project and point
+the `Model` at it:
+
+```ts
+import { Model, onnxEngine } from '@nodalite/ml';
+
+const model = new Model(
+  { type: 'file', path: './models/sentiment.onnx' },
+  onnxEngine(),
+);
+
+await model.warm();
+const result = await model.predict({ text: 'I love this!' });
+```
+
+### Security built in
+
+When using `file` or `url` sources, the `Model` class enforces three
+safety checks by default:
+
+1. **Path traversal protection** — The resolved file path must stay inside
+   `projectRoot` (defaults to `process.cwd()`). Attempts like
+   `path: '../../etc/passwd'` are rejected with a `ModelPathError`.
+
+2. **File size limit** — Models are capped at **50 MB** by default to
+   protect serverless deployments. Override via `maxBytes` or disable with
+   `maxBytes: 0`.
+
+3. **Extension + magic-byte validation** — Only `.onnx`, `.bin`, and
+   `.model` files are accepted by default. `.onnx` files are additionally
+   verified against the ONNX magic bytes (`0x08 0x07`) to catch
+   mislabelled files early.
+
+```ts
+const model = new Model(
+  { type: 'file', path: './models/sentiment.onnx' },
+  onnxEngine(),
+  {
+    projectRoot: '/path/to/project',   // default: process.cwd()
+    maxBytes: 100 * 1024 * 1024,       // 100 MB
+    allowedExtensions: ['.onnx', '.bin', '.model'],
+  },
+);
+```
+
+### Error types
+
+| Error | Code | When |
+|---|---|---|
+| `ModelSizeError` | `MODEL_TOO_LARGE` | Model bytes exceed `maxBytes` |
+| `ModelPathError` | `MODEL_PATH_TRAVERSAL` | File path resolves outside `projectRoot` |
+| `ModelFormatError` | `MODEL_INVALID_FORMAT` | Extension not allowed, or ONNX magic bytes mismatch |
+
 ## Engine-agnostic design
 
 `Model` doesn't care *how* inference runs. The `InferenceEngine` interface is
@@ -45,7 +100,7 @@ just two methods:
 
 ```ts
 interface InferenceEngine {
-  load(modelBytes: Uint8Array): Promise<InferenceSession>;
+  loadSession(modelBytes: Buffer): Promise<InferenceSession>;
 }
 
 interface InferenceSession {
@@ -69,10 +124,10 @@ dependency.
 ```ts
 import { Model, onnxEngine } from '@nodalite/ml';
 
-const model = new Model({
-  source: { url: 'https://models.example.com/model.onnx' },
-  engine: onnxEngine(),
-});
+const model = new Model(
+  { type: 'url', url: 'https://models.example.com/model.onnx' },
+  onnxEngine(),
+);
 ```
 
 ## Should inference run on the main thread?

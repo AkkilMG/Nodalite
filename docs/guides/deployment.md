@@ -48,6 +48,12 @@ zip -j dist/handler.zip dist/handler.mjs
 If you bundle `onnxruntime-node`, you may exceed the 250MB unzipped package
 limit. Use a container image instead.
 
+### Model size limits
+
+`Model` enforces a 50 MB size limit by default (`maxBytes`) to prevent
+accidentally exceeding Lambda's `/tmp` or memory limits. Override via options
+or disable with `maxBytes: 0`. See [ML Inference](/guides/ml-inference).
+
 ## Cloudflare Workers
 
 ```ts

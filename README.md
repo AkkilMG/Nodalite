@@ -22,7 +22,7 @@ build/test/publish playbook. This README is just the quick start.
 - **Security middleware** — CORS, security headers, rate limiting, JWT auth
 - **Background workers** — `worker_threads` for bots, pollers, and CPU offload
 - **Scheduler** — cron/interval scheduling for long-running servers; serverless adapter too
-- **ML inference** — serverless-aware model runner with ONNX Runtime adapter
+- **ML inference** — serverless-aware model runner with local file support, ONNX Runtime adapter, and built-in security (size limits, path protection, format validation)
 - **CLI scaffolding** — interactive project generation via `npx create-nodalite`
 
 ## Requirements
@@ -77,7 +77,7 @@ dependencies installed.
 | `@nodalite/adapter-edge` | `createEdgeHandler(app)` — Cloudflare Workers (Bun/Deno need no adapter) |
 | `@nodalite/workers` | `runDetached()` — independent background thread; `WorkerPool` — CPU offload |
 | `@nodalite/scheduler` | `Scheduler` — cron/interval for long-running servers; `toServerlessTask()` |
-| `@nodalite/ml` | `Model` — cached, engine-agnostic inference runner; `onnxEngine()` adapter |
+| `@nodalite/ml` | `Model` — cached, engine-agnostic inference runner with built-in model security (size limits, path protection, format validation); `onnxEngine()` adapter |
 
 ## Quick start
 

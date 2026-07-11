@@ -33,9 +33,13 @@ npm install nodalite
 npm install @nodalite/core
 ```
 
-Then add adapters as needed:
+Then add adapters and middleware as needed:
 
 ```bash
+# Middleware (depends on @nodalite/core; adds cors, securityHeaders, rateLimit,
+# jwtAuth, csrf, sessions, and more)
+npm install @nodalite/middleware
+
 # Adapters (choose your runtime)
 npm install @nodalite/adapter-node
 npm install @nodalite/adapter-lambda

@@ -69,4 +69,4 @@ app.post('/analyze-sentiment', authMiddleware, async (c) => {
 
 The example uses a dependency-free stand-in model to prove the wiring works.
 Swap in a real ONNX model via `@nodalite/ml` and nothing changes:
-`Model.warm()` in `onColdStart`, `model.run()` in the worker task.
+`Model.warm()` in `onColdStart`, `model.predict()` in the worker task.

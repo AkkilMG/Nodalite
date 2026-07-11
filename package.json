@@ -1,6 +1,6 @@
 {
   "name": "nodalite",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Runtime-agnostic TypeScript API framework — runs on Node, Lambda, Cloudflare Workers, Bun, Deno.",
   "type": "module",
   "keywords": ["monorepo", "api", "framework", "typescript", "runtime-agnostic", "serverless", "worker", "ml"],
@@ -25,7 +25,8 @@
     "lint": "eslint .",
     "changeset": "changeset",
     "release": "npm run build --workspaces --if-present && changeset publish",
-    "dev:basic": "npm run dev -w examples-basic-api"
+    "dev:basic": "npm run dev -w examples-basic-api",
+    "dev:security": "npm run dev -w examples-security-api"
   },
   "overrides": {
     "esbuild": "0.28.1"

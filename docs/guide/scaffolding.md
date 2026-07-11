@@ -45,6 +45,19 @@ generated with working validation via Zod.
 **Job scheduler** (API only) — adds a `@nodalite/scheduler` `Scheduler`
 instance with a sample recurring task and graceful shutdown wiring.
 
+### Structure
+
+Choose how your source code is organized:
+
+| Option | Description |
+|---|---|
+| **Flat** (default) | All routes in a single `src/app.ts` file |
+| **Modular** | Routes split into `src/routes/` with [auto-discovery](/api/core#discover) |
+
+The modular structure automatically discovers route files from the `routes/`
+directory using `discover()`. Subdirectories become route groups, and
+`_prefix.ts` files define prefixes for their directory.
+
 ### Project name
 
 If not provided as a CLI argument, the CLI prompts for a project name and
@@ -56,6 +69,8 @@ The output mirrors the [examples](/examples/basic-api) in the repository,
 customised to your choices. Here is what a full-featured API project
 with all options enabled looks like:
 
+### Flat structure (default)
+
 ```
 my-api/
 ├── src/
@@ -64,6 +79,25 @@ my-api/
 │   └── sentiment-worker.ts   # ML inference worker thread
 ├── package.json              # Dependencies pinned to compatible versions
 └── tsconfig.json             # Strict TypeScript config
+```
+
+### Modular structure
+
+```
+my-api/
+├── src/
+│   ├── app.ts                # Entry point with middleware + discover()
+│   ├── server.ts             # HTTP server + graceful shutdown
+│   └── routes/
+│       ├── _prefix.ts        # Optional: defines "/api" prefix
+│       ├── health.ts         # GET /health
+│       ├── users.ts          # GET/POST /users
+│       └── posts/
+│           ├── _prefix.ts    # defines "/posts" prefix
+│           ├── index.ts      # GET /posts
+│           └── comments.ts   # GET /posts/comments
+├── package.json
+└── tsconfig.json
 ```
 
 ## Installing dependencies

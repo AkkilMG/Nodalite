@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { App } from "@nodalite/core";
 import { openapi } from "./openapi.js";
@@ -291,11 +291,11 @@ describe("OpenAPIApp (integration)", () => {
 
   it("swagger UI endpoint returns HTML", async () => {
     const app = new App();
-    const docs = openapi(app, {
+    openapi(app, {
       info: { title: "HTML Test", version: "1.0.0" },
     });
 
-    const res = await app.handle(req("/docs"));
+    const res = await app.handle(req("/swagger"));
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("text/html");
     const text = await res.text();
@@ -304,7 +304,7 @@ describe("OpenAPIApp (integration)", () => {
 
   it("redoc endpoint returns HTML", async () => {
     const app = new App();
-    const docs = openapi(app, {
+    openapi(app, {
       info: { title: "ReDoc Test", version: "1.0.0" },
     });
 
@@ -405,5 +405,100 @@ describe("OpenAPIApp (integration)", () => {
     expect((post.post as Record<string, unknown>).summary).toBe("Create user");
     expect((post.post as Record<string, unknown>).requestBody).toBeDefined();
     expect((post.post as Record<string, unknown>).responses).toBeDefined();
+  });
+});
+
+// ── Reserved routes ──
+describe("Reserved routes", () => {
+  it("reserve() marks a path as reserved", () => {
+    const app = new App();
+    app.reserve("/swagger");
+    expect(app.isReserved("/swagger")).toBe(true);
+  });
+
+  it("isReserved() returns false for unreserved paths", () => {
+    const app = new App();
+    expect(app.isReserved("/swagger")).toBe(false);
+  });
+
+  it("overriding a reserved path emits a warning and original handler stays", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const app = new App();
+
+    app.get("/swagger", () => new Response("original"));
+    app.reserve("/swagger");
+    app.get("/swagger", () => new Response("override"));
+
+    const res = await app.handle(req("/swagger"));
+    const text = await res.text();
+    expect(text).toBe("original");
+    expect(warnSpy).toHaveBeenCalledOnce();
+    expect(warnSpy.mock.calls[0]![0]).toContain("/swagger");
+    expect(warnSpy.mock.calls[0]![0]).toContain("reserved");
+    warnSpy.mockRestore();
+  });
+
+  it("warn message suggests an alternative path", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const app = new App();
+
+    app.reserve("/swagger");
+    app.get("/swagger", () => new Response("nope"));
+
+    expect(warnSpy).toHaveBeenCalledOnce();
+    const msg = warnSpy.mock.calls[0]![0] as string;
+    expect(msg).toContain("/swagger-1");
+    warnSpy.mockRestore();
+  });
+
+  it("reserved paths are case-sensitive", () => {
+    const app = new App();
+    app.reserve("/Swagger");
+    expect(app.isReserved("/Swagger")).toBe(true);
+    expect(app.isReserved("/swagger")).toBe(false);
+  });
+
+  it("multiple reserved paths are tracked independently", () => {
+    const app = new App();
+    app.reserve("/swagger");
+    app.reserve("/redoc");
+    app.reserve("/openapi.json");
+    expect(app.isReserved("/swagger")).toBe(true);
+    expect(app.isReserved("/redoc")).toBe(true);
+    expect(app.isReserved("/openapi.json")).toBe(true);
+    expect(app.isReserved("/api")).toBe(false);
+  });
+
+  it("openapi() reserves the default /swagger, /redoc, and /openapi.json paths", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const app = new App();
+    openapi(app, { info: { title: "Reserved Test", version: "1.0.0" } });
+
+    expect(app.isReserved("/swagger")).toBe(true);
+    expect(app.isReserved("/redoc")).toBe(true);
+    expect(app.isReserved("/openapi.json")).toBe(true);
+
+    app.get("/swagger", () => new Response("nope"));
+    expect(warnSpy).toHaveBeenCalledOnce();
+
+    const res = await app.handle(req("/swagger"));
+    const text = await res.text();
+    expect(text).toContain("swagger-ui");
+    warnSpy.mockRestore();
+  });
+
+  it("custom paths are reserved when configured", () => {
+    const app = new App();
+    openapi(app, {
+      info: { title: "Custom Reserved", version: "1.0.0" },
+      docsPath: "/api/docs",
+      specPath: "/api/spec.json",
+      redocPath: "/api/redoc",
+    });
+
+    expect(app.isReserved("/api/docs")).toBe(true);
+    expect(app.isReserved("/api/spec.json")).toBe(true);
+    expect(app.isReserved("/api/redoc")).toBe(true);
+    expect(app.isReserved("/swagger")).toBe(false);
   });
 });

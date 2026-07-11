@@ -34,6 +34,12 @@ export class HttpError extends Error {
   static tooManyRequests(message = "Too Many Requests", retryAfterSeconds?: number) {
     return new HttpError(429, message, { expose: true, details: { retryAfterSeconds } });
   }
+  static requestTimeout(message = "Request Timeout") {
+    return new HttpError(408, message, { expose: true });
+  }
+  static unsupportedMediaType(message = "Unsupported Media Type") {
+    return new HttpError(415, message, { expose: true });
+  }
   static internal(message = "Internal Server Error", cause?: unknown) {
     return new HttpError(500, message, { expose: false, cause });
   }

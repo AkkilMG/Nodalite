@@ -83,7 +83,7 @@ type Next = () => Promise<Response>;
 type Middleware<Env extends Record<string, unknown> = Record<string, unknown>> = (c: Context<Env>, next: Next) => Promise<Response>;
 /** A terminal route handler. Distinguished from Middleware only by convention (it usually doesn't call next). */
 type Handler<Env extends Record<string, unknown> = Record<string, unknown>> = (c: Context<Env>) => Promise<Response> | Response;
-type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS" | "ALL";
+type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS" | "QUERY" | "ALL";
 interface RouteMatch<Env extends Record<string, unknown> = Record<string, unknown>> {
     handler: Handler<Env>;
     params: Record<string, string>;
@@ -116,10 +116,15 @@ declare class App<Env extends Record<string, unknown> = Record<string, unknown>>
     put(path: string, handler: Handler<Env>, middlewares?: Middleware<Env>[]): this;
     patch(path: string, handler: Handler<Env>, middlewares?: Middleware<Env>[]): this;
     delete(path: string, handler: Handler<Env>, middlewares?: Middleware<Env>[]): this;
+    query(path: string, handler: Handler<Env>, middlewares?: Middleware<Env>[]): this;
     all(path: string, handler: Handler<Env>, middlewares?: Middleware<Env>[]): this;
     on(method: HttpMethod, path: string, handler: Handler<Env>, middlewares?: Middleware<Env>[]): this;
     /** Group routes under a shared prefix, optionally with group-scoped middleware. */
     group(prefix: string, build: (group: RouteGroup<Env>) => void): this;
+    /** Mark a path as reserved so it cannot be overridden by later route registrations. */
+    reserve(path: string): this;
+    /** Check whether a path is currently reserved. */
+    isReserved(path: string): boolean;
     onError(handler: ErrorHandler<Env>): this;
     notFound(handler: Handler<Env>): this;
     /**
@@ -143,6 +148,7 @@ declare class RouteGroup<Env extends Record<string, unknown>> {
     put(path: string, handler: Handler<Env>, mw?: Middleware<Env>[]): this;
     patch(path: string, handler: Handler<Env>, mw?: Middleware<Env>[]): this;
     delete(path: string, handler: Handler<Env>, mw?: Middleware<Env>[]): this;
+    query(path: string, handler: Handler<Env>, mw?: Middleware<Env>[]): this;
 }
 
 /**
@@ -165,6 +171,8 @@ declare class HttpError extends Error {
     static notFound(message?: string): HttpError;
     static conflict(message?: string): HttpError;
     static tooManyRequests(message?: string, retryAfterSeconds?: number): HttpError;
+    static requestTimeout(message?: string): HttpError;
+    static unsupportedMediaType(message?: string): HttpError;
     static internal(message?: string, cause?: unknown): HttpError;
     toJSON(): {
         details?: {} | null | undefined;
@@ -186,6 +194,9 @@ declare function isHttpError(err: unknown): err is HttpError;
  */
 declare class Router<Env extends Record<string, unknown> = Record<string, unknown>> {
     private root;
+    private reservedPaths;
+    reserve(path: string): void;
+    isReserved(path: string): boolean;
     add(method: HttpMethod, path: string, handler: Handler<Env>, middlewares?: Middleware<Env>[]): void;
     match(method: HttpMethod, path: string): RouteMatch<Env> | null;
     private walk;
@@ -252,4 +263,52 @@ interface ValidateSchemas {
  */
 declare function validate<Env extends Record<string, unknown>>(schemas: ValidateSchemas): Middleware<Env>;
 
-export { App, type AppOptions, Context, type ContextOptions, type ErrorHandler, type Handler, HttpError, type HttpMethod, type InferSchema, type Middleware, type Next, RequestFacade, RouteGroup, type RouteMatch, Router, type StandardSchema, compose, isHttpError, validate };
+interface DiscoverOptions {
+    /** Directory to scan for route files. Relative to the working directory. */
+    dir: string;
+    /** File extensions to include. Defaults to [".ts", ".js", ".mts", ".mjs"]. */
+    extensions?: string[];
+    /** Whether to use directory names as route prefixes. Defaults to true. */
+    useDirectoryPrefix?: boolean;
+    /** Pattern for files that define a prefix for their directory. Defaults to "_prefix". */
+    prefixFile?: string;
+}
+/**
+ * Auto-discovers route files from a directory and registers them on the app.
+ * Each route file should export a default function that receives the app:
+ *
+ * ```ts
+ * // routes/users.ts
+ * import type { App } from "nodalite";
+ * export default (app: App) => {
+ *   app.get("/users", (c) => c.json({ users: [] }));
+ *   app.post("/users", async (c) => { ... });
+ * };
+ * ```
+ *
+ * Subdirectories become route groups with automatic prefix detection:
+ *
+ * ```
+ * routes/
+ *   users.ts          -> app.get("/users", ...)
+ *   posts/
+ *     _prefix.ts      -> export default "/posts"
+ *     index.ts        -> app.get("/", ...)
+ *     comments.ts     -> app.get("/comments", ...)
+ * ```
+ *
+ * ```ts
+ * import { App } from "nodalite";
+ * import { discover } from "@nodalite/core/discover";
+ *
+ * const app = new App();
+ * await discover(app, "./routes");
+ * ```
+ *
+ * Note: auto-discovery uses dynamic `import()`, which works on Node, Bun,
+ * and Deno. For Cloudflare Workers or other bundled runtimes, use static
+ * imports or a build-time generation step instead.
+ */
+declare function discover(appOrDir: App | string, optsOrDir?: string | DiscoverOptions): Promise<void>;
+
+export { App, type AppOptions, Context, type ContextOptions, type DiscoverOptions, type ErrorHandler, type Handler, HttpError, type HttpMethod, type InferSchema, type Middleware, type Next, RequestFacade, RouteGroup, type RouteMatch, Router, type StandardSchema, compose, discover, isHttpError, validate };

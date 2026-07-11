@@ -43,6 +43,12 @@ app.post('/users', async (c) => {
   return c.json({ created: body.name }, { status: 201 });
 });
 
+// QUERY method — safe + idempotent with a body (RFC 10008)
+app.query('/search', async (c) => {
+  const { q } = await c.req.json<{ q: string }>();
+  return c.json({ results: [] });
+});
+
 // Start listening
 serve(app, { port: 3000 });
 console.log('Server running on http://localhost:3000');
@@ -67,6 +73,11 @@ curl -X POST http://localhost:3000/users \
   -H 'content-type: application/json' \
   -d '{"name":"Alice"}'
 # {"created":"Alice"}
+
+curl -X QUERY http://localhost:3000/search \
+  -H 'content-type: application/json' \
+  -d '{"q":"Alice"}'
+# {"results":[]}
 ```
 
 ## Same app on other runtimes

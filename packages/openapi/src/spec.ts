@@ -1,4 +1,4 @@
-import type { StoredRoute, OpenAPIOptions, OpenAPIDocument, OpenAPIPathItem, OpenAPIParameter, OpenAPISchema, OpenAPIRequestBody, OpenAPIResponse } from "./types.js";
+import type { StoredRoute, OpenAPIOptions, OpenAPIDocument, OpenAPIPathItem, OpenAPIParameter, OpenAPISchema, OpenAPIResponse } from "./types.js";
 import { toOpenAPISchema } from "./schema.js";
 
 export function generateSpec<Env extends Record<string, unknown> = Record<string, unknown>>(routes: StoredRoute<Env>[], options: OpenAPIOptions): OpenAPIDocument {

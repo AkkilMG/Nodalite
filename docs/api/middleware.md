@@ -1,6 +1,7 @@
 # @nodalite/middleware
 
-First-party security and utility middleware. Zero runtime dependencies.
+First-party security and utility middleware. Zero runtime dependencies of its
+own — depends only on `@nodalite/core` and `jose` (for JWT).
 
 ```
 npm install @nodalite/middleware
@@ -145,3 +146,279 @@ app.use('*', bodyLimit({ max: 100_000 })); // 100 KB
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `max` | `number` | `1_000_000` | Max body size in bytes |
+
+## csrf()
+
+Double-submit cookie CSRF protection. Works across all runtimes without
+server-side sessions: the server sets a random token as a cookie, and the
+client must echo it back in a header or body field. Safe methods (GET, HEAD,
+OPTIONS, QUERY) are skipped by default.
+
+```ts
+import { csrf } from '@nodalite/middleware';
+
+app.use('*', csrf());
+```
+
+### Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `cookieName` | `string` | `"XSRF-TOKEN"` | Cookie name for the CSRF token |
+| `headerName` | `string` | `"X-XSRF-Token"` | Header name the client must send |
+| `bodyField` | `string` | `"_csrf"` | Request body field (fallback) |
+| `safeMethods` | `string[]` | `['GET','HEAD','OPTIONS','QUERY']` | Methods that skip validation |
+| `generateToken` | `() => string` | `crypto.randomUUID()` | Custom token generator |
+| `cookie` | `object` | — | Cookie options (`httpOnly`, `secure`, `sameSite`, `path`, `maxAge`) |
+
+## requestId()
+
+Generates or propagates a unique request ID for every request. Essential for
+distributed tracing, log correlation, and debugging across services. If the
+client sends an `X-Request-ID` header and `trustUpstream` is true, that
+value is reused.
+
+```ts
+import { requestId } from '@nodalite/middleware';
+
+app.use('*', requestId());
+app.get('/anything', (c) => {
+  const id = c.get('requestId');
+  return c.json({ requestId: id });
+});
+```
+
+### Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `headerName` | `string` | `"X-Request-ID"` | Header name for ID propagation |
+| `generate` | `() => string` | `crypto.randomUUID()` | Custom ID generator |
+| `trustUpstream` | `boolean` | `true` | Forward upstream request IDs |
+| `contextKey` | `string` | `"requestId"` | Context key for the stored ID |
+
+## apiKey()
+
+API key authentication middleware. Validates incoming API keys against a
+pluggable store. Extracts the key from a header, query parameter, or both.
+
+```ts
+import { apiKey, MemoryApiKeyStore } from '@nodalite/middleware';
+
+const store = new MemoryApiKeyStore();
+store.add('my-secret-key', { plan: 'pro' });
+
+app.use('/api/*', apiKey({ store }));
+app.get('/api/data', (c) => {
+  const key = c.get('apiKey');
+  return c.json({ plan: key?.metadata?.plan });
+});
+```
+
+### Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `extractFrom` | `'header' \| 'query' \| 'both'` | `'header'` | Where to read the key from |
+| `headerName` | `string` | `"X-API-Key"` | Header name |
+| `queryParam` | `string` | `"api_key"` | Query parameter name |
+| `store` | `ApiKeyStore` | — | Key store (required) |
+| `contextKey` | `string` | `"apiKey"` | Context key for validated key info |
+
+### `ApiKeyStore` interface
+
+```ts
+interface ApiKeyStore {
+  validate(key: string): Promise<{ id: string; metadata?: Record<string, unknown> } | null>;
+}
+```
+
+### `MemoryApiKeyStore`
+
+In-memory store for development and single-process deployments. Methods:
+`add(key, metadata?)`, `remove(key)`, `validate(key)`, `destroy()`.
+
+::: warning
+`MemoryApiKeyStore` is **not sufficient on serverless or multi-instance
+deployments**. Implement `ApiKeyStore` against Redis, DynamoDB, etc. for
+production.
+:::
+
+## ipGuard()
+
+IP allowlisting/blocklisting middleware. Supports individual IPs and CIDR
+notation (e.g., `192.168.0.0/16`).
+
+```ts
+import { ipGuard } from '@nodalite/middleware';
+
+app.use('*', ipGuard({ mode: 'deny', list: ['10.0.0.0/8', '192.168.0.0/16'] }));
+app.use('/admin/*', ipGuard({ mode: 'allow', list: ['203.0.113.50'] }));
+```
+
+### Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `mode` | `'allow' \| 'deny'` | `'deny'` | Allow-only listed or block listed |
+| `list` | `string[]` | — | IPs or CIDR ranges (required) |
+| `keyGenerator` | `(c) => string` | platform IP or `x-forwarded-for` | How to derive the client IP |
+| `message` | `string` | `"Access denied"` | Custom rejection message |
+
+## contentTypeGuard()
+
+Validates that incoming requests have an allowed `Content-Type` header.
+Rejects with 415 Unsupported Media Type on mismatch.
+
+```ts
+import { contentTypeGuard } from '@nodalite/middleware';
+
+app.post('/data', handler, [contentTypeGuard({ required: ['application/json'] })]);
+app.use('/upload/*', contentTypeGuard({ required: ['multipart/*', 'application/json'] }));
+```
+
+### Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `required` | `string[]` | — | Allowed Content-Types (supports wildcards like `multipart/*`) |
+| `methods` | `string[]` | `['POST','PUT','PATCH','QUERY']` | Methods to enforce on |
+| `message` | `string` | — | Custom rejection message |
+
+## requestTimeout()
+
+Enforces a per-request timeout using `Promise.race`. If the handler chain
+doesn't complete within the specified duration, returns 408 Request Timeout.
+
+```ts
+import { requestTimeout } from '@nodalite/middleware';
+
+app.use('*', requestTimeout({ ms: 10_000 })); // 10 second timeout
+```
+
+### Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `ms` | `number` | — | Timeout in milliseconds (required) |
+| `message` | `string` | — | Custom rejection message |
+
+## xssSanitize()
+
+Sanitizes string values in JSON request bodies to prevent stored XSS. Encodes
+HTML entities (`<`, `>`, `"`, `'`, etc.) by default. The sanitized body is
+stored in context — use `sanitizedBody()` to retrieve it.
+
+```ts
+import { xssSanitize, sanitizedBody } from '@nodalite/middleware';
+
+app.post('/comments', async (c) => {
+  const body = sanitizedBody<{ text: string }>(c);
+  return c.json({ text: body.text });
+}, [xssSanitize()]);
+```
+
+::: warning
+Handlers **must** use `sanitizedBody<T>(c)` instead of `c.req.json()` to
+get sanitized data. The middleware stores the result in context; the original
+request body is not modified.
+:::
+
+### Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `fields` | `string[]` | — | Specific fields to sanitize (all strings if omitted) |
+| `sanitizeQuery` | `boolean` | `false` | Also sanitize query parameters |
+| `sanitizer` | `(value: string) => string` | HTML entity encoding | Custom sanitizer function |
+
+### `sanitizedBody<T>(c)`
+
+Helper function to retrieve the sanitized body from context. Returns the
+sanitized object typed as `T`.
+
+## ssrfGuard()
+
+SSRF (Server-Side Request Forgery) protection. Validates that user-supplied
+URLs don't point to internal/private IP ranges, cloud metadata endpoints, or
+other non-routable addresses. Resolves hostnames via DNS and checks against
+blocked CIDR ranges.
+
+```ts
+import { ssrfGuard } from '@nodalite/middleware';
+
+app.post('/fetch-url', handler, [ssrfGuard()]);
+app.post('/webhook', handler, [ssrfGuard({ allowPrivate: true })]);
+```
+
+Default blocked ranges include RFC 1918 private networks, link-local,
+loopback, and cloud metadata endpoints (`169.254.0.0/16`).
+
+### Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `blockList` | `string[]` | `[]` | Additional IPs/CIDRs to block |
+| `allowPrivate` | `boolean` | `false` | Allow requests to private networks |
+| `extractUrl` | `(c) => Promise<string \| null>` | reads `url` from JSON body | How to extract the target URL |
+| `message` | `string` | — | Custom rejection message |
+
+::: info
+On edge runtimes (Cloudflare Workers), DNS resolution is unavailable —
+IP-level checks are skipped but localhost and protocol validation still apply.
+:::
+
+## sessions()
+
+Cookie-based session middleware with HMAC-signed session IDs. Session data
+lives in the store (in-memory for dev, Redis/database for production). Mutations
+to the session object are automatically persisted after the response.
+
+```ts
+import { sessions } from '@nodalite/middleware';
+
+app.use('*', sessions({ secret: process.env.SESSION_SECRET! }));
+
+app.get('/login', async (c) => {
+  const session = c.get('session');
+  session.userId = '123';
+  return c.json({ loggedIn: true });
+});
+
+app.get('/me', (c) => {
+  const session = c.get('session');
+  return c.json({ userId: session?.userId });
+});
+```
+
+### Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `cookieName` | `string` | `"sid"` | Cookie name |
+| `secret` | `string` | — | HMAC secret for signing session IDs (required) |
+| `maxAge` | `number` | `86400` | Session max age in seconds |
+| `store` | `SessionStore` | `MemorySessionStore` | Session store |
+| `contextKey` | `string` | `"session"` | Context key for session data |
+| `cookie` | `object` | — | Cookie options (`httpOnly`, `secure`, `sameSite`, `path`) |
+
+### `SessionStore` interface
+
+```ts
+interface SessionStore {
+  get(id: string): Promise<Record<string, unknown> | null>;
+  set(id: string, data: Record<string, unknown>, maxAge: number): Promise<void>;
+  destroy(id: string): Promise<void>;
+}
+```
+
+### `MemorySessionStore`
+
+In-memory store with automatic expired-session cleanup. Methods: `get(id)`,
+`set(id, data, maxAge)`, `destroy(id)`, `destroy_()` (release timer + clear).
+
+::: warning
+`MemorySessionStore` is **not sufficient on serverless or multi-instance
+deployments**. Implement `SessionStore` against Redis, DynamoDB, etc. for
+production.
+:::

@@ -118,6 +118,72 @@ app.group('/api/v1', (group) => {
 });
 ```
 
+## QUERY method (RFC 10008)
+
+Nodalite supports the `QUERY` HTTP method — a safe, idempotent method that
+accepts a request body. It bridges the gap between `GET` (no body) and `POST`
+(not safe/idempotent):
+
+| Method | Safe | Idempotent | Body |
+|---|---|---|---|
+| `GET` | Yes | Yes | No |
+| `QUERY` | Yes | Yes | Yes |
+| `POST` | No | No | Yes |
+
+Use `QUERY` for search or filter operations that need a structured body but
+should not cause side effects:
+
+```ts
+app.query('/search', async (c) => {
+  const { filters, sort } = await c.req.json();
+  const results = await db.search(filters, sort);
+  return c.json({ results });
+});
+```
+
+`app.query()` is available on `App` and `RouteGroup`, just like `get`/`post`.
+
+## Auto-discovery
+
+For larger projects, `discover()` auto-registers route files from a directory
+instead of manually importing each one:
+
+```ts
+import { App } from 'nodalite';
+import { discover } from '@nodalite/core';
+
+const app = new App();
+await discover(app, './routes');
+```
+
+Each route file exports a default function receiving the app:
+
+```ts
+// routes/users.ts
+export default (app) => {
+  app.get('/users', list);
+  app.post('/users', create);
+};
+```
+
+Subdirectories become route groups with prefix detection via `_prefix.ts`:
+
+```
+routes/
+  users.ts          -> /users
+  posts/
+    _prefix.ts      -> export default "/posts"
+    index.ts        -> /posts
+    comments.ts     -> /posts/comments
+```
+
+See [API Reference: discover](/api/core#discover) for full options.
+
+::: warning
+Auto-discovery uses dynamic `import()` — it works on Node, Bun, and Deno but
+not on bundled edge runtimes (Cloudflare Workers). Use static imports there.
+:::
+
 ## Error handling
 
 ```ts

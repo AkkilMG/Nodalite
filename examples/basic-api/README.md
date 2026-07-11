@@ -4,6 +4,7 @@ Demonstrates most of the framework in one small app:
 
 - Global security middleware: `logger`, `securityHeaders`, `cors`, `bodyLimit`, `rateLimit`
 - `POST /auth/signup`, `POST /auth/login` — JWT issuance, request validation via Zod (Standard Schema)
+- `QUERY /search` — QUERY method (RFC 10008): safe + idempotent with a request body
 - `GET /api/me`, `POST /api/sentiment` — a JWT-protected route group
 - `POST /api/sentiment` — a CPU-bound "ML" endpoint offloaded to a `WorkerPool`
   so it can't stall other concurrent requests. `src/sentiment-worker.ts` is a
@@ -26,6 +27,11 @@ curl -X POST localhost:3000/auth/signup -H 'content-type: application/json' \
 # => { "token": "..." }
 
 curl localhost:3000/api/me -H "authorization: Bearer <token>"
+
+curl -X QUERY localhost:3000/search \
+  -H 'content-type: application/json' \
+  -H "authorization: Bearer <token>" \
+  -d '{"q":"you@example"}'
 
 curl -X POST localhost:3000/api/sentiment -H "authorization: Bearer <token>" \
   -H 'content-type: application/json' -d '{"text":"this is great"}'

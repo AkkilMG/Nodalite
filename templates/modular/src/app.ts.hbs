@@ -1,0 +1,17 @@
+import { App } from "nodalite";
+import { discover } from "@nodalite/core";{{#if security}}
+import { bodyLimit, cors, logger, rateLimit, securityHeaders } from "@nodalite/middleware";{{/if}}
+
+export const app = new App({ name: "{{projectName}}" });{{#if security}}
+
+app.use("*", logger());
+app.use("*", securityHeaders());
+app.use("*", cors({ origin: ["http://localhost:5173"], credentials: true }));
+app.use("*", bodyLimit(1_000_000));
+app.use("*", rateLimit({ windowMs: 60_000, max: 100 }));
+{{/if}}
+// Auto-discover route files from the routes/ directory
+// Each file exports a default function receiving the app (or a RouteGroup)
+await discover(app, new URL("./routes", import.meta.url).pathname);
+
+app.get("/health", (c) => c.json({ status: "ok" }));

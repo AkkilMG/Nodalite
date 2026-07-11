@@ -16,6 +16,7 @@ vitest.config.*
 
 /resources
 .npmrc
+.changeset/
 
 # Dev files
 *.log

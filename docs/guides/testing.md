@@ -25,6 +25,9 @@ with real timing — not a mocked `Worker` class.
 Tests spin up a real local HTTP server to verify actual disk caching of
 downloaded model bytes. The ~270MB `onnxruntime-node` dependency is replaced
 with a fake `InferenceEngine` implementing the same two-method interface.
+Additional tests cover path traversal rejection, file size limit enforcement,
+extension validation, and ONNX magic-byte verification — all using real
+filesystem operations, not mocks.
 
 ### core
 

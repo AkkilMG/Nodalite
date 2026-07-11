@@ -85,7 +85,22 @@ async function run(projectName?: string) {
     scheduler = r.value ?? false;
   }
 
-  // 5. Project name
+  // 5. File structure (API only)
+  let structure: "flat" | "modular" = "flat";
+  if (purpose === "api") {
+    const r = await prompts({
+      type: "select",
+      name: "value",
+      message: "File structure",
+      choices: [
+        { title: "Flat — single app.ts with all routes inline", value: "flat" },
+        { title: "Modular — auto-discover routes from a routes/ directory", value: "modular" },
+      ],
+    });
+    structure = r.value ?? "flat";
+  }
+
+  // 6. Project name
   const finalProjectName = projectName ?? (
     await prompts({
       type: "text",
@@ -108,16 +123,19 @@ async function run(projectName?: string) {
     if (!r.value) process.exit(0);
   }
 
-  // 6. Determine template directory
-  const templateDir = join(TEMPLATES_DIR, purpose);
+  // 7. Determine template directory
+  const templateDir = purpose === "api" && structure === "modular"
+    ? join(TEMPLATES_DIR, "modular")
+    : join(TEMPLATES_DIR, purpose);
   if (!existsSync(templateDir)) {
     consola.error(`Template not found: ${templateDir}`);
     process.exit(1);
   }
 
-  // 7. Summary
+  // 8. Summary
   const summary = [
     `Purpose: ${pc.cyan(purpose)}`,
+    purpose === "api" ? `Structure: ${pc.cyan(structure)}` : null,
     ml ? `ML inference: ${pc.green("yes")}` : null,
     security ? `Security middleware: ${pc.green("yes")}` : null,
     scheduler ? `Job scheduler: ${pc.green("yes")}` : null,
@@ -129,7 +147,7 @@ async function run(projectName?: string) {
   }
   console.log();
 
-  // 8. Render templates
+  // 9. Render templates
   const templateData = {
     projectName: finalProjectName,
     ml,
@@ -171,7 +189,7 @@ async function run(projectName?: string) {
 
   consola.success(`Project structure created at ${pc.cyan(targetDir)}\n`);
 
-  // 9. Install dependencies
+  // 10. Install dependencies
   consola.info("Installing dependencies...\n");
   try {
     execSync("npm install", { cwd: targetDir, stdio: "inherit" });
@@ -179,7 +197,7 @@ async function run(projectName?: string) {
     consola.warn("npm install failed — you may need to run it manually.");
   }
 
-  // 10. Success
+  // 11. Success
   console.log(`\n  ${pc.green("✦")} ${pc.bold("Project ready!")}\n`);
   console.log(`  ${pc.dim("Next steps:")}`);
   console.log(`    cd ${finalProjectName}`);

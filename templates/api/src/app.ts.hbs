@@ -64,7 +64,13 @@ app.group("/api", (api) => {
 
 app.get("/health", (c) => c.json({ status: "ok" }));
 
-app.get("/hello", (c) => c.json({ message: "Hello from Nodalite!" }));{{#if ml}}{{#unless security}}
+app.get("/hello", (c) => c.json({ message: "Hello from Nodalite!" }));
+
+// QUERY method — safe + idempotent with a body (RFC 10008)
+app.query("/search", async (c) => {
+  const { q } = await c.req.json<{ q: string }>();
+  return c.json({ query: q, results: [] });
+});{{#if ml}}{{#unless security}}
 
 app.post(
   "/sentiment",

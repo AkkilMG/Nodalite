@@ -7,4 +7,6 @@ export { Router } from "./router.js";
 export { compose } from "./compose.js";
 export { validate } from "./validate.js";
 export type { StandardSchema, InferSchema } from "./validate.js";
+export { discover } from "./discover.js";
+export type { DiscoverOptions } from "./discover.js";
 export type { Handler, Middleware, Next, HttpMethod, RouteMatch } from "./types.js";

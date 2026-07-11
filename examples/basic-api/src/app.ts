@@ -33,6 +33,14 @@ app.use("*", rateLimit({ windowMs: 60_000, max: 100 }));
 
 app.get("/health", (c) => c.json({ status: "ok" }));
 
+// QUERY method — safe + idempotent with a body (RFC 10008)
+// Use for search/filter operations that need structured input but cause no side effects.
+app.query("/search", async (c) => {
+  const { q } = await c.req.json<{ q: string }>();
+  const results = [...users.values()].filter((u) => u.email.includes(q));
+  return c.json({ results: results.map(({ id, email }) => ({ id, email })) });
+});
+
 // ---- Public auth routes ----
 const signupSchema = z.object({ email: z.string().email(), password: z.string().min(8) });
 

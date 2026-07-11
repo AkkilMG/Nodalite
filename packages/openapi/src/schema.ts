@@ -52,7 +52,8 @@ export function toOpenAPISchema(schema: unknown): OpenAPISchema {
 }
 
 function stripDollarSchema(schema: Record<string, unknown>): OpenAPISchema {
-  const { $schema, ...rest } = schema;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { $schema: _schema, ...rest } = schema;
   return rest as OpenAPISchema;
 }
 

@@ -1,0 +1,17 @@
+import type { App } from "nodalite";
+import { z } from "zod";
+
+const users = [
+  { id: "1", name: "Alice", email: "alice@example.com" },
+  { id: "2", name: "Bob", email: "bob@example.com" },
+];
+
+export default (app: App) => {
+  app.get("/users", (c) => c.json({ users }));
+
+  app.get("/users/:id", (c) => {
+    const user = users.find((u) => u.id === c.req.param("id"));
+    if (!user) return c.status(404).json({ error: "User not found" });
+    return c.json(user);
+  });
+};

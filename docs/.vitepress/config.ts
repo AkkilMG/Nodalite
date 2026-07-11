@@ -76,6 +76,7 @@ export default defineConfig({
           text: "Examples",
           items: [
             { text: "Basic API", link: "/examples/basic-api" },
+            { text: "Security API", link: "/examples/security-api" },
             { text: "Telegram Bot Thread", link: "/examples/telegram-bot" },
             { text: "Lambda Deployment", link: "/examples/lambda-deploy" },
           ],

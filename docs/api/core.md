@@ -46,13 +46,27 @@ app.use('/api/*', authMiddleware);             // prefixed
 app.use(logger());                             // shorthand for '*'
 ```
 
-#### `get | post | put | patch | delete | all(path, handler, middlewares?)`
+#### `get | post | put | patch | delete | query | all(path, handler, middlewares?)`
 
 Register a route handler with optional route-scoped middleware.
 
 ```ts
 app.get('/users/:id', handler);
 app.post('/users', validate(schema), handler);
+```
+
+#### `query(path, handler, middlewares?)`
+
+Register a handler for the `QUERY` HTTP method ([RFC 10008](https://datatracker.ietf.org/doc/html/rfc10008)).
+`QUERY` is safe and idempotent like `GET`, but supports a request body —
+useful for search or filter operations that are too complex for query strings.
+
+```ts
+app.query('/search', async (c) => {
+  const { filters } = await c.req.json();
+  const results = await db.search(filters);
+  return c.json({ results });
+});
 ```
 
 #### `on(method, path, handler, middlewares?)`
@@ -143,6 +157,8 @@ throw HttpError.badRequest('Invalid input');
 throw HttpError.unauthorized('Login required');
 throw HttpError.forbidden('Not allowed');
 throw HttpError.conflict('Already exists');
+throw HttpError.requestTimeout('Timed out');          // 408
+throw HttpError.unsupportedMediaType('Bad type');     // 415
 throw HttpError.internal('Unexpected error'); // defaults to non-exposed
 throw new HttpError(418, "I'm a teapot", { expose: true });
 ```
@@ -185,3 +201,70 @@ app.post('/users', validate(schema), (c) => {
 ```
 
 On validation failure, returns a 400 response with structured issues.
+
+## discover
+
+Auto-discovers route files from a directory and registers them on the app.
+Each route file should export a default function that receives the app (or a
+`RouteGroup` when inside a prefix directory):
+
+```ts
+// routes/users.ts
+import type { App } from 'nodalite';
+export default (app: App) => {
+  app.get('/users', (c) => c.json({ users: [] }));
+  app.post('/users', async (c) => { ... });
+};
+```
+
+```ts
+import { App } from 'nodalite';
+import { discover } from '@nodalite/core';
+
+const app = new App();
+await discover(app, './routes');
+```
+
+Subdirectories become route groups with automatic prefix detection via
+`_prefix.ts` files:
+
+```
+routes/
+  users.ts          -> app.get("/users", ...)
+  posts/
+    _prefix.ts      -> export default "/posts"
+    index.ts        -> app.get("/", ...)
+    comments.ts     -> app.get("/comments", ...)
+```
+
+`_prefix.ts` should call `app.use()` with the prefix string — `discover`
+captures the first argument:
+
+```ts
+// routes/posts/_prefix.ts
+import type { App } from 'nodalite';
+export default (app: App) => {
+  app.use('/posts');
+};
+```
+
+### Signature
+
+```ts
+discover(app: App, dir: string, options?: DiscoverOptions): Promise<void>
+```
+
+### DiscoverOptions
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `dir` | `string` | — | Directory to scan (relative to cwd) |
+| `extensions` | `string[]` | `['.ts', '.js', '.mts', '.mjs']` | File extensions to include |
+| `useDirectoryPrefix` | `boolean` | `true` | Use directory names as route prefixes |
+| `prefixFile` | `string` | `'_prefix'` | Filename pattern for prefix definition files |
+
+::: warning
+Auto-discovery uses dynamic `import()`, which works on Node, Bun, and Deno.
+For Cloudflare Workers or other bundled runtimes, use static imports or a
+build-time generation step instead.
+:::
