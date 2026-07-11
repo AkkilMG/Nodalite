@@ -32,6 +32,9 @@ hero:
     - theme: alt
       text: View on GitHub
       link: https://github.com/AkkilMG/nodalite
+    - theme: alt
+      text: View on npm
+      link: https://www.npmjs.com/package/nodalite
 
 ---
 

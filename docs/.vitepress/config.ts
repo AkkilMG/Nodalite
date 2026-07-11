@@ -52,6 +52,7 @@ export default defineConfig({
             { text: "@nodalite/workers", link: "/api/workers" },
             { text: "@nodalite/scheduler", link: "/api/scheduler" },
             { text: "@nodalite/ml", link: "/api/ml" },
+            { text: "@nodalite/openapi", link: "/api/openapi" },
           ],
         },
       ],
@@ -86,6 +87,7 @@ export default defineConfig({
 
     socialLinks: [
       { icon: "github", link: "https://github.com/AkkilMG/nodalite" },
+      { icon: "npm", link: "https://www.npmjs.com/package/nodalite" },
     ],
 
     footer: {

@@ -16,6 +16,7 @@
 | Security checklist | [`docs/guides/security.md`](./guides/security.md) |
 | Background threads | [`docs/guides/background-threads.md`](./guides/background-threads.md) |
 | ML inference | [`docs/guides/ml-inference.md`](./guides/ml-inference.md) |
+| OpenAPI (Swagger/ReDoc) | [`docs/api/openapi.md`](./api/openapi.md) |
 | Testing strategy | [`docs/guides/testing.md`](./guides/testing.md) |
 | Publishing & versioning | [`docs/guides/publishing.md`](./guides/publishing.md) |
 | Naming & rebranding | [`docs/guides/rebranding.md`](./guides/rebranding.md) |

@@ -11,5 +11,6 @@
 | [@nodalite/workers](/api/workers) | `runDetached`, `WorkerPool`, `defineWorkerTask` | None (uses built-in `worker_threads`) |
 | [@nodalite/scheduler](/api/scheduler) | `Scheduler`, `toServerlessTask`, `parseCron` | None |
 | [@nodalite/ml](/api/ml) | `Model`, `onnxEngine` | `onnxruntime-node` (optional peer) |
+| [@nodalite/openapi](/api/openapi) | `openapi`, `OpenAPIApp`, `generateSpec`, `toOpenAPISchema`, `swaggerUIHTML`, `redocHTML` | None |
 
 All packages are **ESM + CJS dual-package** and include **TypeScript declarations**.

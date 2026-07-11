@@ -14,11 +14,12 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/nodalite"><img src="https://img.shields.io/npm/v/nodalite?color=blue&logo=npm" alt="npm version" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
-  <a href="package.json"><img src="https://img.shields.io/badge/node-%3E%3D18-brightgreen" alt="Node >=18" /></a>
-  <a href="https://github.com/AkkilMG/Nodalite/actions/workflows/ci.yml"><img src="https://github.com/AkkilMG/Nodalite/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
-  <a href="https://www.npmjs.com/package/nodalite"><img src="https://img.shields.io/npm/dm/nodalite" alt="npm downloads" /></a>
+  <a href="https://www.npmjs.com/package/nodalite"><img src="https://img.shields.io/npm/v/nodalite?style=flat-square&color=blue&logo=npm" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/nodalite"><img src="https://img.shields.io/npm/dm/nodalite?style=flat-square&logo=npm" alt="npm downloads" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License: MIT" /></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.7+-3178C6?style=flat-square&logo=typescript" alt="TypeScript" /></a>
+  <a href="https://github.com/AkkilMG/Nodalite/blob/main/package.json"><img src="https://img.shields.io/badge/node-%3E%3D18-339933?style=flat-square&logo=node.js" alt="Node >=18" /></a>
+  <a href="https://github.com/AkkilMG/Nodalite"><img src="https://img.shields.io/badge/docs-VitePress-649C8B?style=flat-square" alt="Documentation" /></a>
 </p>
 
 ---
