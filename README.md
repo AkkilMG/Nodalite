@@ -1,19 +1,57 @@
-# Nodalite
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="assets/light.png">
+    <img alt="Nodalite" src="assets/light.png" width="128" height="128" />
+  </picture>
+</p>
 
-[![npm version](https://img.shields.io/npm/v/nodalite?color=blue&logo=npm)](https://www.npmjs.com/package/nodalite)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Node >=18](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](package.json)
-[![CI](https://github.com/AkkilMG/Nodalite/actions/workflows/ci.yml/badge.svg)](https://github.com/AkkilMG/Nodalite/actions/workflows/ci.yml)
-[![npm downloads](https://img.shields.io/npm/dm/nodalite)](https://www.npmjs.com/package/nodalite)
+<h1 align="center">Nodalite</h1>
 
-A small, runtime-agnostic TypeScript API framework: the same `App` instance
-runs unmodified on a Node server, AWS Lambda, and Cloudflare Workers, with
-built-in security middleware, an independent-background-thread pattern for
-things like bots/pollers, and a serverless-aware ML inference runner.
+<p align="center">
+  <strong>Runtime-agnostic TypeScript API framework</strong><br/>
+  <em>The same <code>App</code> runs unmodified on Node, Lambda, Cloudflare Workers, Bun, and Deno.</em>
+</p>
 
-Read **[`docs/GUIDE.md`](./docs/GUIDE.md)** for the full architecture
-rationale, security checklist, deployment guide, and the complete
-build/test/publish playbook. This README is just the quick start.
+<p align="center">
+  <a href="https://www.npmjs.com/package/nodalite"><img src="https://img.shields.io/npm/v/nodalite?color=blue&logo=npm" alt="npm version" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
+  <a href="package.json"><img src="https://img.shields.io/badge/node-%3E%3D18-brightgreen" alt="Node >=18" /></a>
+  <a href="https://github.com/AkkilMG/Nodalite/actions/workflows/ci.yml"><img src="https://github.com/AkkilMG/Nodalite/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://www.npmjs.com/package/nodalite"><img src="https://img.shields.io/npm/dm/nodalite" alt="npm downloads" /></a>
+</p>
+
+---
+
+## Table of Contents
+
+- [Why Nodalite?](#why-nodalite)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Scaffolding](#scaffolding)
+- [Packages](#packages)
+- [Quick Start](#quick-start)
+- [Examples](#examples)
+- [Development](#development)
+- [Contributing](#contributing)
+- [Security](#security)
+- [License](#license)
+
+---
+
+## Why Nodalite?
+
+Most Node.js frameworks assume a single runtime. Nodalite doesn't.
+
+- **Write once, deploy anywhere** — the same `App` instance runs unmodified on Node.js, Bun, Deno, Cloudflare Workers, and AWS Lambda. No conditional imports, no adapter swapping at the application level.
+- **Zero-dependency core** — `@nodalite/core` has literally zero runtime dependencies. It only uses what the JS runtime already provides (Fetch API). Smaller attack surface, faster installs, no supply-chain surprises.
+- **Security by default** — built-in middleware for CORS, security headers, rate limiting, JWT auth, and body size limits. Follows OWASP guidance ("reject, don't sanitize") with structured error responses.
+- **Serverless-aware** — cold start hooks, disk-cached ML models, body size limits that check `Content-Length` before buffering, and adapters that properly convert API Gateway event shapes.
+
+> Read **[`docs/`](https://github.com/AkkilMG/Nodalite/tree/main/docs)** for the full architecture rationale, API reference, security checklist, and deployment guide.
+
+---
 
 ## Features
 
@@ -24,14 +62,23 @@ build/test/publish playbook. This README is just the quick start.
 - **Scheduler** — cron/interval scheduling for long-running servers; serverless adapter too
 - **ML inference** — serverless-aware model runner with local file support, ONNX Runtime adapter, and built-in security (size limits, path protection, format validation)
 - **CLI scaffolding** — interactive project generation via `npx create-nodalite`
+- **Request validation** — Standard Schema support (Zod, Valibot, ArkType) with structured 400 responses
+
+---
 
 ## Requirements
 
-- **Node.js >= 18** — required for built-in Fetch API, `worker_threads`, and `crypto.subtle`
-- Cloudflare Workers, Bun, and Deno work with `@nodalite/adapter-edge` or no adapter at all
-- `onnxruntime-node` is an optional peer dependency (only needed for ONNX ML inference)
+| Requirement | Details |
+|---|---|
+| **Node.js >= 18** | Required for built-in Fetch API, `worker_threads`, and `crypto.subtle` |
+| **Cloudflare Workers / Bun / Deno** | Use `@nodalite/adapter-edge` or no adapter at all |
+| **`onnxruntime-node`** | Optional peer dependency — only needed for ONNX ML inference |
+
+---
 
 ## Installation
+
+**Core package:**
 
 ```bash
 npm install nodalite
@@ -39,16 +86,20 @@ npm install nodalite
 npm install @nodalite/core
 ```
 
-Or install adapters as needed:
+**Adapters & extras** — install only what you need:
 
 ```bash
-npm install @nodalite/adapter-node    # Node.js server
-npm install @nodalite/adapter-lambda  # AWS Lambda
-npm install @nodalite/adapter-edge    # Cloudflare Workers
-npm install @nodalite/workers         # Background threads
-npm install @nodalite/scheduler       # Cron/interval scheduling
-npm install @nodalite/ml              # ML inference
+npm install @nodalite/adapter-node      # Node.js server
+npm install @nodalite/adapter-lambda    # AWS Lambda
+npm install @nodalite/adapter-edge      # Cloudflare Workers
+npm install @nodalite/middleware         # Security & HTTP middleware
+npm install @nodalite/workers            # Background threads
+npm install @nodalite/scheduler          # Cron/interval scheduling
+npm install @nodalite/ml                 # ML inference
+npm install @nodalite/openapi            # OpenAPI spec generation + Swagger UI
 ```
+
+---
 
 ## Scaffolding
 
@@ -65,21 +116,28 @@ Lambda, Edge), and optionally add **ML inference**, **security middleware**,
 and a **job scheduler**. A ready-to-run project is generated with all
 dependencies installed.
 
+---
+
 ## Packages
 
-| Package | What it is |
-|---|---|
-| `nodalite` | Unscoped alias — re-exports everything from `@nodalite/core`. |
-| `@nodalite/core` | Router, `Context`, `App`, middleware, errors, validation. Zero dependencies. |
+| Package | Description |
+|:---|:---|
+| `nodalite` | Unscoped alias — re-exports everything from `@nodalite/core` |
+| `@nodalite/core` | Router, `Context`, `App`, middleware, errors, validation. **Zero dependencies.** |
 | `@nodalite/middleware` | `cors`, `securityHeaders`, `rateLimit`, `jwtAuth`, `logger`, `bodyLimit` |
 | `@nodalite/adapter-node` | `serve(app)` — run on a plain Node http/https server |
 | `@nodalite/adapter-lambda` | `createLambdaHandler(app)` — API Gateway v1/v2 + Lambda Function URLs |
 | `@nodalite/adapter-edge` | `createEdgeHandler(app)` — Cloudflare Workers (Bun/Deno need no adapter) |
 | `@nodalite/workers` | `runDetached()` — independent background thread; `WorkerPool` — CPU offload |
 | `@nodalite/scheduler` | `Scheduler` — cron/interval for long-running servers; `toServerlessTask()` |
-| `@nodalite/ml` | `Model` — cached, engine-agnostic inference runner with built-in model security (size limits, path protection, format validation); `onnxEngine()` adapter |
+| `@nodalite/ml` | `Model` — cached, engine-agnostic inference runner with built-in model security |
+| `@nodalite/openapi` | OpenAPI 3.1.0 spec generation, Swagger UI, and ReDoc endpoints |
 
-## Quick start
+---
+
+## Quick Start
+
+### Node.js
 
 ```ts
 import { App } from '@nodalite/core';
@@ -96,60 +154,92 @@ app.get('/users/:id', (c) => c.json({ id: c.req.param('id') }));
 serve(app, { port: 3000 });
 ```
 
-The exact same `app` also works as a Lambda handler:
+### AWS Lambda
+
 ```ts
 import { createLambdaHandler } from '@nodalite/adapter-lambda';
 export const handler = createLambdaHandler(app);
 ```
-...or on Cloudflare Workers:
+
+### Cloudflare Workers
+
 ```ts
 import { createEdgeHandler } from '@nodalite/adapter-edge';
 export default createEdgeHandler(app);
 ```
-...or directly on Bun/Deno, since `app.fetch` already matches their native
-server signature — no adapter needed at all.
+
+### Bun / Deno
+
+No adapter needed — `app.fetch` already matches their native server signature:
+
+```ts
+export default { fetch: app.fetch };
+```
+
+---
 
 ## Examples
 
-- **`examples/basic-api`** — the fullest example: signup/login with JWT,
-  request validation (Zod via Standard Schema), rate limiting, security
-  headers, a route group, and a CPU-bound "ML" endpoint offloaded to a
-  `WorkerPool` (swap in a real ONNX model via `@nodalite/ml` and the wiring
-  doesn't change). Run it:
-  ```bash
-  npm install && npm run dev -w examples-basic-api
-  ```
-- **`examples/telegram-bot-thread`** — the same API server, plus a Telegram
-  bot's long-polling loop running on an independent, supervised
-  `worker_thread` via `runDetached()`. Set `TELEGRAM_BOT_TOKEN` and run:
-  ```bash
-  npm run dev -w examples-telegram-bot-thread
-  ```
-- **`examples/lambda-deploy`** — the same `App` shape, deployed as a real
-  AWS Lambda function, with a working esbuild bundle + zip script:
-  ```bash
-  npm run build -w examples-lambda-deploy
-  ```
+| Example | Description | Run |
+|:---|:---|:---|
+| **`examples/basic-api`** | Signup/login with JWT, Zod validation, rate limiting, security headers, route groups, and a CPU-bound endpoint offloaded to a `WorkerPool` | `npm run dev -w examples-basic-api` |
+| **`examples/telegram-bot-thread`** | API server + Telegram bot long-polling on an independent `worker_thread` via `runDetached()` | `npm run dev -w examples-telegram-bot-thread` |
+| **`examples/lambda-deploy`** | Same `App` deployed as an AWS Lambda function with esbuild bundle + zip script | `npm run build -w examples-lambda-deploy` |
+| **`examples/ml-inference`** | ML model inference using `@nodalite/ml` with `onnxEngine()` | See example directory |
+| **`examples/security-api`** | Security middleware showcase | See example directory |
+
+---
 
 ## Development
 
 ```bash
-npm install           # install everything across the workspace
-npm run build --workspaces --if-present  # build every package (tsup, ESM + CJS + .d.ts)
-npm test              # run every package's test suite (Vitest)
-npm run typecheck --workspaces --if-present  # tsc --noEmit across every package
+# Install everything across the workspace
+npm install
+
+# Build every package (tsup: ESM + CJS + .d.ts)
+npm run build --workspaces --if-present
+
+# Run every package's test suite (Vitest)
+npm test
+
+# Type-check across every package
+npm run typecheck --workspaces --if-present
+
+# Lint
+npm run lint
 ```
 
-See **[`CONTRIBUTING.md`](./CONTRIBUTING.md)** and **[`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md)** before opening issues or PRs.
+Every package is genuinely tested, not just typed: `adapter-node` tests start
+a real HTTP server and hit it with `fetch()`; `adapter-lambda` tests use
+realistic API Gateway event fixtures; `workers` tests spawn real
+`worker_threads` including a crash/restart cycle; `ml` tests spin up a real
+local server to verify on-disk model caching.
 
-Every package here is genuinely tested, not just typed: `adapter-node`'s
-tests start a real HTTP server and hit it with `fetch()`; `adapter-lambda`'s
-tests use realistic API Gateway event fixtures; `workers`' tests spawn real
-`worker_threads` including a real crash/restart cycle; `ml`'s tests spin up
-a real local server to verify on-disk model caching. See
-[`docs/GUIDE.md` §8.4](./docs/GUIDE.md#84-testing-strategy) for the full
-testing philosophy.
+---
+
+## Contributing
+
+We welcome contributions! Please read our community files before opening issues or PRs:
+
+- [**Contributing Guide**](./CONTRIBUTING.md) — development workflow, code style, PR process
+- [**Code of Conduct**](./CODE_OF_CONDUCT.md) — Contributor Covenant v2.1
+- [**Changelog**](./CHANGELOG.md) — version history and release notes
+
+```bash
+git clone https://github.com/AkkilMG/Nodalite.git
+cd nodalite
+npm install
+npm test
+```
+
+---
+
+## Security
+
+If you discover a security vulnerability, please report it privately by emailing **me@akkil.dev**. Do **not** open a public GitHub issue. See [SECURITY.md](./SECURITY.md) for details.
+
+---
 
 ## License
 
-MIT
+[MIT](LICENSE) &copy; 2024-present [Akkil](https://akkil.dev)
