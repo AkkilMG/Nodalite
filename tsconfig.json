@@ -1,0 +1,19 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/core/tsconfig.build.json" },
+    { "path": "packages/middleware/tsconfig.build.json" },
+    { "path": "packages/ws/tsconfig.build.json" },
+    { "path": "packages/workers/tsconfig.build.json" },
+    { "path": "packages/scheduler/tsconfig.build.json" },
+    { "path": "packages/nodalite/tsconfig.build.json" },
+    { "path": "packages/openapi/tsconfig.build.json" },
+    { "path": "packages/adapter-node/tsconfig.build.json" },
+    { "path": "packages/adapter-lambda/tsconfig.build.json" },
+    { "path": "packages/adapter-edge/tsconfig.build.json" },
+    { "path": "packages/ml/tsconfig.build.json" },
+    { "path": "packages/create-nodalite/tsconfig.build.json" },
+    { "path": "packages/auth/tsconfig.build.json" },
+    { "path": "packages/otel/tsconfig.build.json" }
+  ]
+}

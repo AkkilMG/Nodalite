@@ -1,0 +1,76 @@
+{
+  "name": "@nodalite/ws",
+  "version": "0.1.0",
+  "license": "MIT",
+  "keywords": ["websocket", "ws", "realtime", "channels", "rooms"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkkilMG/Nodalite.git",
+    "directory": "packages/ws"
+  },
+  "bugs": {
+    "url": "https://github.com/AkkilMG/Nodalite/issues"
+  },
+  "description": "Runtime-agnostic WebSocket support for Nodalite: rooms, channels, heartbeat, and adapters for Node, Cloudflare Workers, Bun, Deno, and AWS Lambda.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "import": "./dist/node.js",
+      "require": "./dist/node.cjs"
+    },
+    "./edge": {
+      "types": "./dist/edge.d.ts",
+      "import": "./dist/edge.js",
+      "require": "./dist/edge.cjs"
+    },
+    "./bun": {
+      "types": "./dist/bun.d.ts",
+      "import": "./dist/bun.js",
+      "require": "./dist/bun.cjs"
+    },
+    "./lambda": {
+      "types": "./dist/lambda.d.ts",
+      "import": "./dist/lambda.js",
+      "require": "./dist/lambda.cjs"
+    }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts src/node.ts src/edge.ts src/bun.ts src/lambda.ts --format esm,cjs --dts --clean --minify",
+    "test": "vitest run",
+    "typecheck": "tsc -b tsconfig.build.json"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "ws": "^8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "ws": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@nodalite/core": "*",
+    "ws": "^8.18.0",
+    "@types/ws": "^8.5.0",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.0",
+    "vitest": "^4.0.0"
+  }
+}

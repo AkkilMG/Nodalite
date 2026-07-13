@@ -102,21 +102,9 @@ Write-Host "  Node.js $nodeVersion - OK" -ForegroundColor Green
 if (-not $SkipInstall) {
     $step++
     Write-Step -Current $step -Total $totalSteps -Message "Installing dependencies"
-    Invoke-Step -Description "npm ci" -Command { npm ci }
+    Invoke-Step -Description "npm i" -Command { npm i }
     Write-Host "  Dependencies installed." -ForegroundColor Green
 }
-
-# -- Step: Lint ----------------------------------------------------
-$step++
-Write-Step -Current $step -Total $totalSteps -Message "Linting"
-Invoke-Step -Description "npm run lint" -Command { npm run lint }
-Write-Host "  Lint passed." -ForegroundColor Green
-
-# -- Step: Typecheck -----------------------------------------------
-$step++
-Write-Step -Current $step -Total $totalSteps -Message "Typechecking"
-Invoke-Step -Description "npm run typecheck" -Command { npm run typecheck }
-Write-Host "  Typecheck passed." -ForegroundColor Green
 
 # -- Step: Build ---------------------------------------------------
 $step++
@@ -131,6 +119,19 @@ if (-not $SkipTests) {
     Invoke-Step -Description "npm run test" -Command { npm run test }
     Write-Host "  All tests passed." -ForegroundColor Green
 }
+
+# -- Step: Lint ----------------------------------------------------
+$step++
+Write-Step -Current $step -Total $totalSteps -Message "Linting"
+Invoke-Step -Description "npm run lint" -Command { npm run lint }
+Write-Host "  Lint passed." -ForegroundColor Green
+
+# -- Step: Typecheck -----------------------------------------------
+$step++
+Write-Step -Current $step -Total $totalSteps -Message "Typechecking"
+Invoke-Step -Description "npm run typecheck" -Command { npm run typecheck }
+Write-Host "  Typecheck passed." -ForegroundColor Green
+
 
 # -- Step: Changeset version ---------------------------------------
 if ($Version) {

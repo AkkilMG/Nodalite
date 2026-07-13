@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": true
+  },
+  "references": [
+    { "path": "../core/tsconfig.build.json" }
+  ]
+}

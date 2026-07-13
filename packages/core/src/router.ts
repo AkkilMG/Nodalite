@@ -6,11 +6,11 @@ interface Node<Env extends Record<string, unknown>> {
   paramChild?: Node<Env>;
   wildcardChild?: Node<Env>;
   handlers: Map<HttpMethod, Handler<Env>>;
-  middlewares: Middleware<Env>[];
+  middlewares: Map<HttpMethod, Middleware<Env>[]>;
 }
 
 function createNode<Env extends Record<string, unknown>>(): Node<Env> {
-  return { static: new Map(), handlers: new Map(), middlewares: [] };
+  return { static: new Map(), handlers: new Map(), middlewares: new Map() };
 }
 
 /**
@@ -63,7 +63,7 @@ export class Router<Env extends Record<string, unknown> = Record<string, unknown
     }
 
     node.handlers.set(method, handler);
-    node.middlewares = middlewares;
+    node.middlewares.set(method, middlewares);
   }
 
   match(method: HttpMethod, path: string): RouteMatch<Env> | null {
@@ -75,7 +75,7 @@ export class Router<Env extends Record<string, unknown> = Record<string, unknown
     const handler = node.handlers.get(method) ?? node.handlers.get("ALL");
     if (!handler) return null;
 
-    return { handler, params, middlewares: node.middlewares };
+    return { handler, params, middlewares: node.middlewares.get(method) ?? [] };
   }
 
   private walk(node: Node<Env>, segments: string[], i: number, params: Record<string, string>): Node<Env> | null {

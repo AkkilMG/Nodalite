@@ -95,6 +95,7 @@ describe("errors", () => {
   });
 
   it("hides internal error messages by default", async () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
     const app = new App();
     app.get("/boom", () => {
       throw new Error("leaked secret");
@@ -103,6 +104,7 @@ describe("errors", () => {
     expect(res.status).toBe(500);
     const body = (await res.json()) as { error: string };
     expect(body.error).toBe("Internal Server Error");
+    spy.mockRestore();
   });
 
   it("supports a custom error handler", async () => {

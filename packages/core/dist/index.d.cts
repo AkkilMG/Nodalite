@@ -264,8 +264,12 @@ interface ValidateSchemas {
 declare function validate<Env extends Record<string, unknown>>(schemas: ValidateSchemas): Middleware<Env>;
 
 interface DiscoverOptions {
-    /** Directory to scan for route files. Relative to the working directory. */
-    dir: string;
+    /** Directory to scan for route files. Relative to the working directory. Mutually exclusive with `entries`. */
+    dir?: string;
+    /** Pre-resolved route modules. Keys are virtual file paths (e.g. `"./routes/users.ts"`). Mutually exclusive with `dir`. */
+    entries?: Record<string, RouteEntryModule>;
+    /** Virtual root prefix to strip from entry keys before processing. */
+    virtualRoot?: string;
     /** File extensions to include. Defaults to [".ts", ".js", ".mts", ".mjs"]. */
     extensions?: string[];
     /** Whether to use directory names as route prefixes. Defaults to true. */
@@ -273,6 +277,12 @@ interface DiscoverOptions {
     /** Pattern for files that define a prefix for their directory. Defaults to "_prefix". */
     prefixFile?: string;
 }
+type RouteModule = ((app: App) => void | Promise<void>) | {
+    default: (app: App) => void | Promise<void>;
+};
+type RouteEntryModule = RouteModule | {
+    default: string;
+} | (() => Promise<RouteModule>);
 /**
  * Auto-discovers route files from a directory and registers them on the app.
  * Each route file should export a default function that receives the app:

@@ -1,0 +1,60 @@
+{
+  "name": "@nodalite/auth",
+  "version": "0.1.0",
+  "license": "MIT",
+  "keywords": ["auth", "jwt", "oauth2", "rbac", "session", "password", "csrf", "security"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkkilMG/Nodalite.git",
+    "directory": "packages/auth"
+  },
+  "bugs": {
+    "url": "https://github.com/AkkilMG/Nodalite/issues"
+  },
+  "description": "Authentication and authorization for Nodalite: JWT with refresh tokens, OAuth2, RBAC, sessions, password hashing, and CSRF protection.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=18"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./stores/redis": {
+      "types": "./dist/stores/redis.d.ts",
+      "import": "./dist/stores/redis.js",
+      "require": "./dist/stores/redis.cjs"
+    }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup src/index.ts src/stores/redis.ts --format esm,cjs --dts --clean --minify",
+    "test": "vitest run",
+    "typecheck": "tsc -b tsconfig.build.json"
+  },
+  "dependencies": {
+    "@nodalite/core": "*",
+    "jose": "^6.0.0"
+  },
+  "peerDependencies": {
+    "ioredis": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "ioredis": { "optional": true }
+  },
+  "devDependencies": {
+    "ioredis": "^5.6.1",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.0",
+    "vitest": "^4.0.0"
+  }
+}

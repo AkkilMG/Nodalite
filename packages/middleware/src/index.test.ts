@@ -1,5 +1,5 @@
 import { App } from "@nodalite/core";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { apiKey, MemoryApiKeyStore } from "./api-key.js";
 import { bodyLimit } from "./body-limit.js";
 import { contentTypeGuard } from "./content-type-guard.js";
@@ -133,6 +133,16 @@ describe("bodyLimit", () => {
 });
 
 describe("logger", () => {
+  let errorSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    errorSpy.mockRestore();
+  });
+
   it("logs method, path, status, and durationMs on success", async () => {
     const lines: Record<string, unknown>[] = [];
     const app = new App();

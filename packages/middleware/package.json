@@ -40,7 +40,20 @@
     "@nodalite/core": "*",
     "jose": "^6.0.0"
   },
+  "peerDependencies": {
+    "@aws-sdk/client-dynamodb": ">=3.0.0",
+    "@upstash/redis": ">=1.0.0",
+    "@upstash/ratelimit": ">=2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@aws-sdk/client-dynamodb": { "optional": true },
+    "@upstash/redis": { "optional": true },
+    "@upstash/ratelimit": { "optional": true }
+  },
   "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@upstash/ratelimit": "^2.0.0",
+    "@upstash/redis": "^1.0.0",
     "tsup": "^8.5.1",
     "typescript": "^6.0.0",
     "vitest": "^4.0.0"
