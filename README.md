@@ -257,4 +257,4 @@ If you discover a security vulnerability, please report it privately by emailing
 
 ## License
 
-[MIT](LICENSE) &copy; 2024-present [Akkil](https://akkil.dev)
+[MIT](LICENSE) &copy; 2026-present [Akkil M G](https://akkil.dev)

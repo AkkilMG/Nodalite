@@ -143,4 +143,4 @@ Yes! See [CONTRIBUTING.md](https://github.com/AkkilMG/nodalite/blob/main/CONTRIB
 ## License
 
 MIT — see the [LICENSE](https://github.com/AkkilMG/nodalite/blob/main/LICENSE) file.
-Copyright © 2024-present Akkil.
+Copyright © 2026-present Akkil M G.

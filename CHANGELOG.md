@@ -461,30 +461,14 @@ This project uses [Changesets](https://github.com/changesets/changesets) for ver
 
 The following features and improvements are being ideated and may appear in upcoming releases:
 
-### Planned
-
-- **WebSocket support (`@nodalite/ws`)** — Real-time bidirectional communication. Requires genuinely different handling per runtime (Node's `ws` library, Cloudflare's `WebSocketPair`, API Gateway's WebSocket API) and deserves its own adapter package rather than bolting half-support onto the HTTP core. Considerations: connection lifecycle management, heartbeat/ping-pong, room/channel abstractions, and serverless WebSocket API integration.
-
-- **Modular route auto-discovery (`discover()`)** — File-system based route loading from a `routes/` directory. Subdirectories become route groups, `_prefix.ts` files define prefixes. Already documented in the scaffolding guide as a planned structure option. Will enable `import { discover } from '@nodalite/core'; app.use(discover('./routes'))` for zero-boilerplate route registration.
-
-- **Distributed rate limiting** — Production-ready `RateLimitStore` implementations for Redis (via `@upstash/ratelimit` or `ioredis`) and DynamoDB. The current `MemoryRateLimitStore` is explicitly documented as insufficient for serverless/multi-instance deployments.
-
 ### Under Consideration
 
-- **OpenAPI improvements** — The `@nodalite/openapi` package (`0.1.2`) is currently untested in production (commit message: "not tested"). Planned hardening: response schema auto-inference from handler return types, `discriminator` support for discriminated unions, security scheme definitions (API key, OAuth2, Bearer), webhook support, and request/response example generation.
-
-- **Password hashing middleware** — Deliberately not shipped in `0.1.0` because the right choice (Argon2id, bcrypt, scrypt) has real tradeoffs. Being considered as an optional `@nodalite/middleware` add-on with a sensible default (Argon2id) and configurable parameters.
+- **OpenAPI improvements** — Hardening `@nodalite/openapi`: response schema auto-inference from handler return types, `discriminator` support for discriminated unions, security scheme definitions (API key, OAuth2, Bearer), webhook support, and request/response example generation.
 
 - **Performance benchmarking suite** — Automated benchmarks using `autocannon` against a baseline workload, with p50/p99 latency and req/s reporting. Important before publishing any performance claims.
-
-- **TypeScript project references** — For faster cross-package type-checking as the monorepo grows. Currently using shared `tsconfig.base.json` which is simpler but doesn't scale as well for incremental builds.
-
-- **`@nodalite/auth`** — Dedicated authentication package consolidating JWT, OAuth2, session management, and role-based access control into a cohesive auth layer beyond the current `jwtAuth` middleware.
 
 ### Long-term
 
 - **Edge-native ML inference** — WebAssembly-based model execution via `onnxruntime-web` for Cloudflare Workers and other edge runtimes where native binaries aren't available. Would complement the existing `onnxEngine()` adapter for Node.js.
-
-- **OpenTelemetry integration** — Built-in tracing and metrics via `@nodalite/otel` for observability in production deployments.
 
 - **Plugin system** — A formal plugin API for extending `App` with reusable middleware bundles, route collections, and lifecycle hooks.
