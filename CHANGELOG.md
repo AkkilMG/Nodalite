@@ -459,9 +459,28 @@ This project uses [Changesets](https://github.com/changesets/changesets) for ver
 
 ## What's Next
 
-The following features and improvements are being ideated and may appear in upcoming releases:
+The following features and improvements are being ideated and may appear in upcoming releases. Each is designed to challenge established frameworks (NestJS, FastAPI, Express.js) by solving their pain points — without replicating their architectural baggage.
 
-### Under Consideration
+### Short-term
+
+- **Dependency Injection (DI) Container (`@nodalite/di`)** — Lightweight, runtime-agnostic, decorator-free DI scoped per request. Constructor injection, provider factories, and singleton/transient/request-scoped lifetimes. Unlike NestJS, the DI container is fully optional — opt in only where you need it. Compatible with all runtimes (Node, Bun, Deno, Workers). *Challenges NestJS where DI is mandatory and tightly coupled to the module system.*
+
+- **Database integration layer (`@nodalite/db`)** — Unified migration runner, schema seeding, and transaction helpers for Drizzle, Prisma, and Kysely. Works with `@nodalite/scheduler` for periodic cleanup tasks, `@nodalite/workers` for CPU-intensive queries, and Lambda adapter for connection-pool warming. *Fills the gap that Express/FastAPI leave entirely manual; avoids NestJS's forced ORM coupling.*
+
+- **GraphQL & tRPC support**
+  - `@nodalite/graphql` — Mount a GraphQL Yoga or Apollo server as Nodalite middleware with context injection, auth middleware reuse, and runtime-agnostic execution.
+  - `@nodalite/trpc` — Mount a tRPC router as a Nodalite handler, reusing middleware chains, validation schemas, and error handling.
+  - *Matches FastAPI's Strawberry GraphQL and NestJS's `@nestjs/graphql`; Express requires manual setup.*
+
+- **File upload handling (`@nodalite/upload`)** — Multipart form parsing with schema validation, size limits, content-type enforcement, and streaming to disk / S3 / R2. Progress callbacks and integration with `bodyLimit()` middleware. *Replaces Express's `multer` and FastAPI's `UploadFile` with a runtime-agnostic equivalent.*
+
+- **WebSocket broadcasting improvements (`@nodalite/ws`)** — User-scoped broadcasting (emit to specific user IDs across connections), Redis pub/sub adapter for multi-instance deployments, automatic reconnection handling, and per-connection metadata filters. *Brings parity with Socket.IO and FastAPI's `websockets`; NestJS's WS layer is Node-only.*
+
+- **CLI generators (`npx nodalite generate`)** — Scaffold routes, middleware, validators, and OpenAPI specs with `npx nodalite generate resource <name>` (generates route file, validation schema, handler stub, OpenAPI metadata). `npx nodalite generate middleware` and `npx nodalite generate module` for reusable groupings. *Mirrors NestJS CLI's productivity boost without its rigid module structure.*
+
+- **Caching layer (`@nodalite/cache`)** — Decorator-based and middleware-based response caching with in-memory, Redis, and DynamoDB backends. Cache invalidation by tag, automatic stale-while-revalidate, and per-route TTL. *NestJS has `@nestjs/cache-manager`; FastAPI and Express have nothing built-in.*
+
+- **Testing utilities (`@nodalite/testing`)** — `TestClient` (like FastAPI's `TestClient`) that runs handlers in-memory without a real server, mock helpers for auth/session/rate-limit stores, and assertion helpers for response shapes. Integration with Vitest out of the box. *Express and NestJS rely on `supertest`; this is runtime-aware and includes adapter mocks.*
 
 - **OpenAPI improvements** — Hardening `@nodalite/openapi`: response schema auto-inference from handler return types, `discriminator` support for discriminated unions, security scheme definitions (API key, OAuth2, Bearer), webhook support, and request/response example generation.
 
@@ -469,6 +488,22 @@ The following features and improvements are being ideated and may appear in upco
 
 ### Long-term
 
-- **Edge-native ML inference** — WebAssembly-based model execution via `onnxruntime-web` for Cloudflare Workers and other edge runtimes where native binaries aren't available. Would complement the existing `onnxEngine()` adapter for Node.js.
+- **Edge-native GraphQL subscriptions** — WebSocket-based GraphQL subscriptions backed by Cloudflare Durable Objects, using `@nodalite/ws` as the transport layer. Subscriptions survive worker hibernation. *Neither Express nor NestJS can run GraphQL subscriptions on the edge; FastAPI requires a separate ASGI server.*
 
-- **Plugin system** — A formal plugin API for extending `App` with reusable middleware bundles, route collections, and lifecycle hooks.
+- **Admin panel generator** — `npx nodalite generate admin` creates a fully functional admin UI (React, Vue, or Svelte) with auth, CRUD operations, and dashboards derived from your OpenAPI spec. *Goes beyond FastAPI's read-only Swagger/ReDoc UI — generates actual management interfaces.*
+
+- **Hot-reload / HMR for development (`nodalite dev`)** — Watch mode using esbuild or Vite that hot-reloads routes, middleware, and handlers without restarting the server process. Preserves in-memory scheduler state and WebSocket connections across reloads. *Faster iteration than NestJS's `--watch` (full process restart) and Express's manual nodemon setup.*
+
+- **SSE (Server-Sent Events) support (`@nodalite/sse`)** — First-class SSE primitive: auto-reconnect, event IDs, per-connection channels, and backpressure handling. Works on all runtimes including edge. *FastAPI has `StreamingResponse`; Express/NestJS need manual `res.write` plumbing. Nodalite makes SSE as ergonomic as `c.json()`.*
+
+- **Plugin / Module system (`@nodalite/plugin`)** — Formal plugin API for reusable modules that bundle routes, middleware, DI providers, lifecycle hooks (`onStart`, `onStop`), and their own OpenAPI specs. Unlike NestJS modules, plugins are runtime-agnostic and composable across scopes. *Challenges NestJS's module system by being optional, lighter, and cross-runtime.*
+
+- **Distributed tracing viewer** — Dev-mode middleware that serves a local trace viewer (like Jaeger UI) showing filtered spans by route, method, status, and duration. Works with `@nodalite/otel` spans. *Neither NestJS, Express, nor FastAPI offers built-in trace visualization.*
+
+- **Workflow / Saga engine (`@nodalite/workflows`)** — Long-running business processes with steps, automatic retries, compensation (saga pattern), and state persistence via Redis/DynamoDB. Designed for serverless — survives Lambda cold starts. *Fills the microservices orchestration gap that NestJS partially covers with `@nestjs/cqrs` and that FastAPI/Express lack entirely.*
+
+- **Multi-tenant support (`@nodalite/tenancy`)** — Built-in tenant isolation: tenant resolution (subdomain, header, JWT claim), per-tenant database connection pooling, tenant-scoped caching, and middleware that enforces tenant boundaries. *A manual pain point in all three frameworks — Nodalite makes it declarative.*
+
+- **gRPC support (`@nodalite/grpc`)** — Code-first protobuf generation from TypeScript interfaces, bidirectional streaming RPCs, reflection, and health-check protocol. Works on Node and Bun. *NestJS has `@nestjs/microservices` gRPC transport; Express and FastAPI lack built-in gRPC.*
+
+- **Edge-native ML inference** — WebAssembly-based model execution via `onnxruntime-web` for Cloudflare Workers and other edge runtimes where native binaries aren't available. Would complement the existing `onnxEngine()` adapter for Node.js.
