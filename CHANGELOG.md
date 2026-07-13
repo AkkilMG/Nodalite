@@ -6,6 +6,114 @@ This project uses [Changesets](https://github.com/changesets/changesets) for ver
 
 ---
 
+## [0.1.3] — 2026-07-13
+
+### Added
+
+#### `@nodalite/auth` — Authentication & authorization
+
+- **New package `@nodalite/auth`** — comprehensive authentication and authorization layer for Nodalite, built on `jose` (WebCrypto) and runtime-agnostic crypto APIs (`crypto.subtle`, `crypto.getRandomValues`) so it works across Node, Bun, Deno, Cloudflare Workers, and AWS Lambda.
+  - **JWT authentication** (`jwtAuth(opts)`) — Bearer token extraction, verification with configurable algorithm (default `HS256`), issuer, and audience. Attaches verified payload to the request context.
+  - **Token pair issuance** (`issueTokenPair(opts)`) — issues access + refresh JWT pairs with configurable expiry (`15m` access, `7d` refresh defaults). Access tokens carry `sub`, `roles`, `permissions`; refresh tokens carry `tokenId` and `family` for rotation tracking.
+  - **Refresh token rotation** (`tokenRefreshHandler(opts)`) — returns a handler that verifies the refresh token, checks revocation status, performs rotation (delete old → issue new pair), and stores the new refresh token. **Replay-attack detection**: if a revoked token is replayed, the entire token family is revoked and the session is flagged as compromised.
+  - **Token revocation** (`revokeToken(tokenId, store)`) — marks a single refresh token as revoked; `revokeFamily(family)` on the store revokes all tokens in a rotation family.
+  - **OAuth2 Authorization Code + PKCE** (`oauth2authorize(opts)`, `oauth2Callback(opts)`) — complete PKCE flow with S256 code challenge. Built-in provider presets for **Google**, **GitHub**, and **Discord** (each with authorization URL, token URL, userinfo URL, and default scopes). `mapProfile()` normalizes provider-specific user info into a standard `OAuth2Profile` shape.
+  - **Role-based access control** (`rbac(opts)`) — middleware that resolves permissions from JWT `roles` + `permissions` claims against a configurable `RbacMap`. Attaches an `RbacContext` with `hasRole()`, `hasPermission()`, `hasAnyRole()`, `hasAllPermissions()`. Route-level guard middlewares: `requireRole(...roles)`, `requirePermission(...perms)` — return 403 on failure.
+  - **Cookie-based sessions** (`sessions(opts)`) — HMAC-SHA256 signed session IDs (24 random bytes + signature), pluggable `SessionStore` interface (Memory or Redis). Attaches a mutable `Proxy` of session data to the context. Secure cookie defaults: `httpOnly`, `secure`, `sameSite: "Lax"`.
+  - **Password hashing** (`hashPassword(password, opts?)`, `verifyPassword(password, hashString)`) — PBKDF2-SHA256 with 16-byte random salt and 600,000 iterations (configurable). Portable hash format: `pbkdf2:sha256:<iterations>:<base64-salt>:<base64-hash>`. Constant-time comparison via XOR to prevent timing attacks.
+  - **CSRF protection** (`csrf(opts?)`) — double-submit cookie pattern (no server-side sessions required). On safe methods: sets `XSRF-TOKEN` cookie. On unsafe methods: validates token from cookie + header (`X-XSRF-Token`) or JSON body field (`_csrf`). Configurable cookie name, header name, body field, and safe methods.
+  - **Pluggable stores**: `TokenStore` and `SessionStore` interfaces with `MemoryTokenStore` / `MemorySessionStore` (Map-backed, 60s cleanup interval, `.unref()`'d timers) and `RedisTokenStore` / `RedisSessionStore` (exported via `@nodalite/auth/stores/redis`, uses `ioredis` with pipeline for atomic batch operations, configurable key prefixes).
+  - **764 lines of tests** (~40 test cases) covering password hashing, JWT verification, token issuance/refresh/revocation, OAuth2 authorize/callback, RBAC context building and guards, session creation/persistence, CSRF token seeding/validation, memory store operations, and a full end-to-end integration test (issue → store → access protected route → RBAC-gated route → refresh → verify rotation).
+
+#### `@nodalite/otel` — OpenTelemetry integration
+
+- **New package `@nodalite/otel`** — thin, ergonomic wrapper around `@opentelemetry/api` that integrates directly with Nodalite's middleware system for distributed tracing and HTTP metrics.
+  - **`otel(opts?)` middleware** — creates `SpanKind.SERVER` spans for each request with standard HTTP semantic convention attributes (`http.request.method`, `url.full`, `url.path`, `url.scheme`, `server.address`, `server.port`, `http.response.status_code`). Extracts incoming W3C Trace Context (`traceparent`) headers for distributed tracing. Records errors via `span.recordException()` with `SpanStatusCode.ERROR`.
+  - **Built-in metrics** — `requestDuration` (histogram, ms), `activeRequests` (UpDownCounter), `requestCount` (Counter), `requestBodySize` / `responseBodySize` (histogram, By). All attribute keys follow OTel HTTP semantic conventions.
+  - **`getSpan(c)`** — retrieves the active OTel span from the request context for custom attribute enrichment.
+  - **`withSpan(name, fn, opts?)`** — convenience wrapper for creating child spans around arbitrary operations with auto-cleanup, error recording, and optional initial attributes.
+  - **`createMetrics(opts?)`** — standalone factory that creates the same metric instruments without requiring the middleware, for custom metrics beyond auto-recording.
+  - **Configurable**: `serviceName`, `tracing` toggle, `metrics` toggle, `recordHeaders` / `recordResponseHeaders`, `ignoredPaths` (zero-overhead path exclusion), custom `getSpanName` callback.
+  - **282 lines of tests** (16 test cases) covering span creation, error recording, path exclusion, custom span names, header recording, trace context propagation, response body size recording, `getSpan` / `withSpan` helpers.
+
+#### `@nodalite/ws` — WebSocket support
+
+- **New package `@nodalite/ws`** — runtime-agnostic WebSocket server with path-based routing, message middleware, rooms, heartbeat, and adapters for Node.js, Cloudflare Workers, Deno, Bun, and AWS Lambda.
+  - **`WsServer`** — core runtime-agnostic server class. `path(pattern, handlers)` registers lifecycle handlers (`open`, `message`, `close`, `error`) per WebSocket path with exact match and `*` wildcard support. `use(middleware)` registers global message middleware (classic `next()` chain). `on("connection", handler)` / `on("error", handler)` for global events. `broadcast(data)` for all clients. `toRoom(room)` returns a scoped `WsBroadcaster`.
+  - **`WsConnection`** — unified wrapper across all runtimes. `id` (UUID), `request` (Fetch API), `remoteAddress`, `platform` metadata. Room management: `join(...rooms)`, `leave(...rooms)`, `isJoined(room)`, `to(...rooms)` (scoped broadcaster excluding self), `broadcast(data)` (all clients excluding self). Per-connection typed state: `set(key, value)` / `get(key)` with generic `Env` parameter.
+  - **`RoomManager`** — in-memory bidirectional connection↔room mapping. O(1) lookups, ephemeral rooms (destroyed when last member leaves).
+  - **`HeartbeatManager`** — configurable keep-alive (default 30s interval, 10s timeout, `{"t":"ping"}` payload). Protocol-level ping/pong on Node.js; application-level JSON pings on edge runtimes.
+  - **Node.js adapter** (`@nodalite/ws/node`) — `serveWs(app, wsServer, opts?)` serves HTTP + WebSocket on the same port. `attachWs(server, wsServer, opts?)` attaches to an existing server. Dual mode: `ws` library (optional peer dependency, protocol-level pings) or zero-dependency fallback with a raw RFC 6455 frame parser and handshake implementation.
+  - **Cloudflare Workers adapter** (`@nodalite/ws/edge`) — `createEdgeWsHandler(app)` using `WebSocketPair`, passes `env` and `waitUntil` into platform metadata.
+  - **Deno adapter** (`@nodalite/ws/edge`) — `createDenoWsHandler(app)` using `Deno.upgradeWebSocket()`.
+  - **Bun adapter** (`@nodalite/ws/bun`) — `createBunWsHandler(app)` using Bun's native `server.upgrade()` API.
+  - **AWS Lambda adapter** (`@nodalite/ws/lambda`) — `createLambdaWsHandler(app, opts)` for API Gateway WebSocket API. Requires `ConnectionStore` interface (pluggable, no bundled implementation) and `postToConnection` function (SDK-agnostic). Handles CONNECT, MESSAGE, DISCONNECT events with in-memory `connCache` per invocation.
+  - **`ConnectionStore` interface** (`LambdaWsOptions.store`) — `set`, `get`, `delete`, `findBy`, `cleanup?` for external state persistence (DynamoDB, Redis, Postgres, etc.).
+  - **Zero runtime dependencies** — `ws` is an optional peer dependency only for the Node.js adapter's preferred path.
+  - **~3,000+ lines of tests** across all adapters covering connection lifecycle, message handling, room management, heartbeat timeout, multi-path routing, error handling, and edge cases per runtime.
+
+#### `@nodalite/core` — Route auto-discovery
+
+- **`discover(app, dir)` / `discover(app, options)`** (`packages/core/src/discover.ts`) — scans a directory (or in-memory virtual map) for route files and auto-registers them on an `App`. Exported from `@nodalite/core` and subpath `@nodalite/core/discover`.
+  - **Filesystem mode** — dynamically imports `.ts`/`.js`/`.mts`/`.mjs` files (configurable extensions) from a directory. First pass detects `_prefix.ts` files (string export or function calling `app.use("/prefix")`). Second pass loads route modules, wrapping them in `app.group(prefix, ...)` when a prefix exists. Recurses into subdirectories (skipping `.hidden` dirs and `node_modules`). Nested prefixes accumulate: root `/api` + child `/v1` = `/api/v1/users`.
+  - **Entries mode** — accepts a `Record<string, RouteEntryModule>` map (e.g., from `import.meta.glob`) for bundler environments. Builds a virtual directory tree from flat keys, applies the same prefix detection and route loading logic.
+  - **`DiscoverOptions`**: `dir`, `entries`, `virtualRoot`, `extensions` (default `[.ts, .js, .mts, .mjs]`), `useDirectoryPrefix` (default `true`), `prefixFile` (default `"_prefix"`).
+  - **511 lines of tests** (25+ test cases) covering error handling, single/multiple route loading, prefix function/string exports, nested prefix accumulation, custom extensions/prefix files, hidden directories, entries mode with lazy/ direct/ function exports, virtual root stripping, empty entries, and parameterized routes.
+
+#### `@nodalite/middleware` — Distributed rate limiting
+
+- **Five new `RateLimitStore` implementations** alongside the existing `MemoryRateLimitStore`, all implementing the same `increment(key, windowMs) → { count, resetMs }` interface:
+  - **`DynamoDBRateLimitStore`** (`packages/middleware/src/rate-limit/dynamodb.ts`) — fixed-window counter via two-phase conditional DynamoDB `UpdateItem`. Phase 1: atomic increment within active window. Phase 2 (rare): reset and start new window on `ConditionalCheckFailedException`. Uses DynamoDB TTL for automatic stale entry cleanup. Peer dependency: `@aws-sdk/client-dynamodb` (optional).
+  - **`RedisRateLimitStore`** (`packages/middleware/src/rate-limit/redis.ts`) — fixed-window counter via atomic Lua script (`INCR` + conditional `PEXPIRE` + `PTTL`) in a single round-trip. Uses `ioredis` (imported as type, consumer must install separately).
+  - **`RedisSlidingWindowRateLimitStore`** (`packages/middleware/src/rate-limit/sliding-window.ts`) — true sliding-window via Redis sorted sets (ZSET) and atomic Lua script (`ZREMRANGEBYSCORE` + `ZADD` + `PEXPIRE` + `ZCARD`). Avoids the boundary problem of fixed windows. Uses `ioredis`.
+  - **`UpstashRedisRateLimitStore`** (`packages/middleware/src/rate-limit/upstash-redis.ts`) — fixed-window counter via Lua script adapted for `@upstash/redis` REST-based HTTP transport. Peer dependency: `@upstash/redis` (optional).
+  - **`UpstashRateLimitStore`** (`packages/middleware/src/rate-limit/upstash.ts`) — thin adapter wrapping `@upstash/ratelimit`, delegating window management entirely to the library. Peer dependency: `@upstash/ratelimit` (optional).
+
+#### Examples
+
+- **`examples/ws-chat`** — real-time chat room application demonstrating `@nodalite/ws` capabilities:
+  - Two WebSocket endpoints (`/chat` and `notifications`) with path-based routing.
+  - Room management: users join a `chat` room; messages broadcast to room members via `conn.to('chat').emit()`.
+  - Per-connection typed state: username extracted from query string, stored via `conn.set()`/`conn.get()`.
+  - Heartbeat keep-alive (30s interval, 10s timeout).
+  - Mixed HTTP + WebSocket on the same port via `serveWs()`: `/health` (connection count), `/stats` (connection count + user list), `/broadcast` (POST endpoint triggering WebSocket broadcast from HTTP).
+  - Connection lifecycle: join notifications, welcome messages with user list, departure announcements.
+  - Graceful shutdown on SIGINT/SIGTERM.
+  - Built with `@nodalite/core`, `@nodalite/adapter-node`, `@nodalite/ws`, `ws`.
+
+#### Documentation
+
+- **API references** — new per-package documentation pages:
+  - `docs/api/auth.md` (359 lines) — full reference for `@nodalite/auth`: JWT, token pairs, refresh rotation, OAuth2 PKCE, RBAC, sessions, password hashing, CSRF, stores.
+  - `docs/api/errors.md` (90 lines) — `HttpError` class reference: factory methods, `expose` flag, structured JSON responses, custom error handlers, `isHttpError()` type guard.
+  - `docs/api/openapi.md` (418 lines) — `@nodalite/openapi` reference: spec generation, Zod schema conversion, Swagger UI, ReDoc, route metadata types.
+  - `docs/api/otel.md` (182 lines) — `@nodalite/otel` reference: middleware, metrics, span helpers, setup with OTLP exporter.
+  - `docs/api/ws.md` (440 lines) — `@nodalite/ws` reference: multi-runtime quick starts, `WsServer`, `WsConnection`, rooms, heartbeat, all adapter APIs, Lambda `ConnectionStore`.
+- **Guides** — new tutorial and reference pages:
+  - `docs/guides/migration.md` (111 lines) — migration guide for breaking changes since v0.1.2: `@nodalite/middleware` → `@nodalite/auth` moves, `logger()` → `otel()` replacement, `discover()` signature change.
+  - `docs/guides/typescript.md` (157 lines) — TypeScript usage patterns: generics, typed route params, request body typing, Standard Schema validation, middleware/handler/error typing.
+- **Examples** — `docs/examples/ws-chat.md` (125 lines) — annotated walkthrough of the WebSocket chat example with inline code, run instructions, and pattern reference table.
+- **Assets** — `assets/logo.svg` (project logo), `assets/dark.png`, `assets/light.png` (documentation screenshots).
+- **`docs.ps1`** — new VitePress documentation deployment script (builds docs, deploys to GitHub Pages via orphan branch strategy).
+
+### Changed
+
+- **Router middleware-per-method isolation** (`packages/core/src/router.ts`) — the `middlewares` field on trie `Node` changed from a flat `Middleware<Env>[]` array (shared across all HTTP methods at a node) to a `Map<HttpMethod, Middleware<Env>[]>` (scoped per method). `match()` now returns `node.middlewares.get(method) ?? []` instead of `node.middlewares`. This ensures middlewares registered with a specific HTTP method (e.g., `app.get("/x", handler, [auth])`) only apply to that method, not to other methods sharing the same path node.
+
+#### Monorepo & Toolchain
+
+- **TypeScript project references** — new root `tsconfig.json` with `"files": []` and 14 `references` pointing to per-package `tsconfig.build.json` files. Every package now has a `tsconfig.build.json` extending its own `tsconfig.json` with `"composite": true` and `"emitDeclarationOnly": true`. Packages with internal dependencies (`auth`, `otel`, `ws`) reference `../core/tsconfig.build.json` for correct incremental build ordering.
+- **Vitest config** — new root `vitest.config.ts` with `@nodalite/core` aliased to source (`packages/core/src`), test discovery via `packages/*/src/**/*.test.ts`, and `node` test environment.
+- **Publish script** (`publish.ps1`) — reordered quality gates from install → lint → typecheck → build → test to install → **build → test** → lint → typecheck (functional failures caught faster). `npm ci` changed to `npm i`.
+- **Middleware package** (`packages/middleware/package.json`) — new optional peer dependencies: `@aws-sdk/client-dynamodb` (>=3.0.0), `@upstash/redis` (>=1.0.0), `@upstash/ratelimit` (>=2.0.0).
+- **README** — added `@nodalite/openapi` to the packages list and installation section.
+
+### Fixed
+
+- **Router middleware leak across HTTP methods** — previously, registering the same path with different HTTP methods (e.g., `GET /users` with auth middleware and `OPTIONS /users` without) caused the last `add()` call to overwrite the middleware list for **all** methods at that trie node. The middleware-per-method refactor ensures each method has its own independent middleware stack, fixing silent middleware duplication/loss.
+
+---
+
 ## [0.1.2] — 2026-07-07
 
 ### Added
