@@ -1,3 +1,7 @@
+---
+description: API reference for @nodalite/ws: runtime-agnostic WebSocket server with rooms, heartbeat, path routing, and adapters for Node, Edge, Bun, Deno, and Lambda.
+---
+
 # @nodalite/ws
 
 Runtime-agnostic WebSocket server with path-based routing, rooms, heartbeat, and per-connection state.

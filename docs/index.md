@@ -3,6 +3,7 @@ layout: home
 
 title: Nodalite
 titleTemplate: Runtime-agnostic TypeScript API framework
+description: Build APIs that run on Node.js, Bun, Deno, Cloudflare Workers, and AWS Lambda — same code, zero dependencies, built-in security.
 
 hero:
   name: Nodalite

@@ -1,3 +1,7 @@
+---
+description: API reference for @nodalite/scheduler: Scheduler with cron/interval scheduling, parseCron, nextRun, and toServerlessTask for Lambda.
+---
+
 # @nodalite/scheduler
 
 Schedule recurring tasks for long-running servers, or convert them to

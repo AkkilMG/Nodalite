@@ -1,3 +1,7 @@
+---
+description: Introduction to Nodalite, a runtime-agnostic TypeScript API framework that runs unmodified on Node.js, Bun, Deno, Cloudflare Workers, and AWS Lambda.
+---
+
 # Introduction
 
 **Nodalite** is a small, runtime-agnostic TypeScript API framework. The same

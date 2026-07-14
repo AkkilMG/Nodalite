@@ -1,3 +1,7 @@
+---
+description: Basic API example: signup/login with JWT, Zod validation, rate limiting, security headers, route groups, and WorkerPool CPU offload.
+---
+
 # Basic API Example
 
 The fullest example in the repo: signup/login with JWT, request validation,

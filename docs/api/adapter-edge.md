@@ -1,3 +1,7 @@
+---
+description: API reference for @nodalite/adapter-edge: createEdgeHandler() to run Nodalite on Cloudflare Workers with env bindings support.
+---
+
 # @nodalite/adapter-edge
 
 Run a Nodalite app on Cloudflare Workers.

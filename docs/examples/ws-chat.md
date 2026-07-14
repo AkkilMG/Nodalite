@@ -1,3 +1,7 @@
+---
+description: WebSocket chat example: real-time chat room using @nodalite/ws with rooms, per-connection state, heartbeat, and multi-path routing.
+---
+
 # WebSocket Chat
 
 A real-time chat room using `@nodalite/ws` with rooms, per-connection state, and multi-path routing.

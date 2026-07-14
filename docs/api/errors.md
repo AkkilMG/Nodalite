@@ -1,3 +1,7 @@
+---
+description: API reference for HttpError: typed HTTP errors with factory methods, expose flag, structured JSON responses, and custom error handlers.
+---
+
 # Errors
 
 ## HttpError

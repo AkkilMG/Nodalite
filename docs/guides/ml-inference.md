@@ -1,3 +1,7 @@
+---
+description: Guide to ML inference with @nodalite/ml: serverless-aware model caching, ONNX runtime, disk caching across cold starts, and security.
+---
+
 # ML Inference
 
 `@nodalite/ml`'s `Model` class is designed for the three things that make ML

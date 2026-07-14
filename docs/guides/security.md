@@ -1,3 +1,7 @@
+---
+description: Production security checklist for Nodalite: CORS, security headers, rate limiting, JWT auth, CSRF, SSRF protection, and input validation.
+---
+
 # Security Checklist
 
 Everything here ships in `@nodalite/middleware`. Understanding *why* each one

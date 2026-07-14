@@ -1,3 +1,7 @@
+---
+description: Migration guide for Nodalite breaking changes: middleware to auth moves, logger to otel replacement, and discover signature changes.
+---
+
 # Migration Guide
 
 This guide covers breaking changes and import path updates across Nodalite

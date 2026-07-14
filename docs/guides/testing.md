@@ -1,3 +1,7 @@
+---
+description: Nodalite testing strategy: real integration tests over mocks, per-package testing approach, and Vitest configuration.
+---
+
 # Testing Strategy
 
 Nodalite's tests follow one rule: **prefer a real integration test over a

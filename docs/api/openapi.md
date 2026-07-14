@@ -1,3 +1,7 @@
+---
+description: API reference for @nodalite/openapi: OpenAPI 3.1.0 spec generation, Swagger UI, ReDoc, and Zod schema conversion.
+---
+
 # @nodalite/openapi
 
 OpenAPI 3.1.0 spec generation, Swagger UI, and ReDoc for Nodalite —

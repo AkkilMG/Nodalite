@@ -1,3 +1,7 @@
+---
+description: TypeScript guide for Nodalite: generics, typed route params, request body typing, Standard Schema validation, and middleware typing patterns.
+---
+
 # TypeScript Guide
 
 Nodalite is written in TypeScript 6.0+ and designed for full type safety from

@@ -1,3 +1,7 @@
+---
+description: API reference for @nodalite/auth: JWT access/refresh tokens, OAuth2 PKCE, RBAC, sessions, password hashing, and CSRF protection.
+---
+
 # @nodalite/auth
 
 Authentication and authorization for Nodalite: JWT with refresh tokens, OAuth2 (PKCE), role-based access control, cookie-based sessions, password hashing, and CSRF protection.

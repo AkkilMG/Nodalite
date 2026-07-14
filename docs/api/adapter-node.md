@@ -1,3 +1,7 @@
+---
+description: API reference for @nodalite/adapter-node: serve() to run Nodalite on a plain Node.js HTTP/HTTPS server with graceful shutdown.
+---
+
 # @nodalite/adapter-node
 
 Run a Nodalite app on a plain Node.js HTTP/HTTPS server.

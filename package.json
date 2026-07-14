@@ -3,7 +3,7 @@
   "version": "0.1.3",
   "description": "Runtime-agnostic TypeScript API framework — runs on Node, Lambda, Cloudflare Workers, Bun, Deno.",
   "type": "module",
-  "keywords": ["monorepo", "api", "framework", "typescript", "runtime-agnostic", "serverless", "worker", "ml"],
+  "keywords": ["api", "framework", "typescript", "runtime-agnostic", "serverless", "worker", "ml", "hono", "express", "fastify", "cloudflare-workers", "lambda", "bun", "deno", "websocket", "jwt", "oauth", "openapi", "edgedev", "rest-api", "api-framework", "nodejs", "web"],
   "license": "MIT",
   "author": "Akkil <me@akkil.dev>",
   "repository": {
@@ -13,7 +13,7 @@
   "bugs": {
     "url": "https://github.com/AkkilMG/Nodalite/issues"
   },
-  "homepage": "https://github.com/AkkilMG/Nodalite#readme",
+  "homepage": "https://nodalite.akkil.dev",
   "engines": {
     "node": ">=18"
   },

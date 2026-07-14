@@ -1,3 +1,7 @@
+---
+description: Telegram bot example: API server plus Telegram bot long-polling on an independent worker_thread via runDetached().
+---
+
 # Telegram Bot Thread Example
 
 Demonstrates an API server plus a Telegram bot's long-polling loop running on

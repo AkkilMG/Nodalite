@@ -1,3 +1,7 @@
+---
+description: API reference for @nodalite/otel: OpenTelemetry middleware for HTTP tracing, request metrics, span enrichment, and W3C trace context propagation.
+---
+
 # @nodalite/otel
 
 OpenTelemetry integration for Nodalite: built-in tracing, metrics, and context propagation for production observability.

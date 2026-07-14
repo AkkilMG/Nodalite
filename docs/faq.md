@@ -1,3 +1,7 @@
+---
+description: Frequently asked questions about Nodalite: Fetch API, package design, database integration, auth, WebSocket, OpenAPI, auto-discovery, and security.
+---
+
 # FAQ
 
 ## Why Fetch API instead of Express-style req/res?
@@ -53,18 +57,14 @@ points via the `exports` map in `package.json`.
 
 ## Is there a WebSocket solution?
 
-Not yet. WebSockets need genuinely different handling per runtime (Node's `ws`
-library vs. Cloudflare's `WebSocketPair` vs. API Gateway's separate WebSocket
-API) and deserve their own adapter package (`@nodalite/ws`) rather than bolting
-half-support onto the HTTP-shaped core.
+Yes — [`@nodalite/ws`](/api/ws) provides a runtime-agnostic WebSocket server with path-based routing, rooms, heartbeat, and per-connection typed state. It includes adapters for Node.js, Cloudflare Workers, Deno, Bun, and AWS Lambda. On Node.js, it can use the `ws` library or a zero-dependency RFC 6455 fallback.
 
 ## What's deliberately NOT included?
 
 - **No ORM/database layer** — use Drizzle, Prisma, Kysely directly
 - **No DI container** — `c.set`/`c.get` with a `Map` is sufficient; bring
   `tsyringe` or `awilix` if you need more
-- **No OpenAPI generation** — addable later via `zod-to-openapi`
-- **No WebSocket support** — planned as a separate package
+- **No file upload handling** — use Busboy, formidable, or any multipart library directly
 
 ## What is the QUERY method?
 

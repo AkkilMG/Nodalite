@@ -1,3 +1,7 @@
+---
+description: Guide to Nodalite background threads using runDetached() with worker_threads. Covers bots, pollers, serverless alternatives, and honest limits.
+---
+
 # Background Threads
 
 `runDetached()` spawns a supervised `worker_thread` that lives for the

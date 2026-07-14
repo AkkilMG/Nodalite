@@ -1,3 +1,7 @@
+---
+description: Core concepts of Nodalite: Fetch API foundation, request pipeline, Context, route groups, QUERY method, auto-discovery, and error handling.
+---
+
 # Core Concepts
 
 ## The Fetch API foundation

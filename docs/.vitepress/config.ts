@@ -1,17 +1,53 @@
-import { defineConfig } from "vitepress";
+import { defineConfig, HeadConfig } from "vitepress";
 
 const base = process.env.CUSTOM_DOMAIN ? "/" : "/Nodalite/";
+const hostname = process.env.CUSTOM_DOMAIN ? "https://nodalite.akkil.dev" : "https://akkilmg.github.io";
 
 export default defineConfig({
+  lang: "en-US",
   base,
   title: "Nodalite",
   description: "Runtime-agnostic TypeScript API framework for Node, Bun, Deno, Cloudflare Workers, and AWS Lambda.",
   cleanUrls: true,
   lastUpdated: true,
 
+  sitemap: {
+    hostname,
+  },
+
   head: [
     ["link", { rel: "icon", href: `${base}favicon.ico` }],
+    ["link", { rel: "icon", type: "image/png", sizes: "32x32", href: `${base}favicon-32x32.png` }],
+    ["link", { rel: "icon", type: "image/png", sizes: "16x16", href: `${base}favicon-16x16.png` }],
+    ["link", { rel: "apple-touch-icon", sizes: "192x192", href: `${base}apple-touch-icon.png` }],
+    ["link", { rel: "manifest", href: `${base}site.webmanifest` }],
+    ["meta", { name: "theme-color", content: "#3451b2" }],
+    ["meta", { name: "og:type", content: "website" }],
+    ["meta", { name: "og:locale", content: "en_US" }],
+    ["meta", { name: "og:site_name", content: "Nodalite" }],
+    ["meta", { name: "og:image", content: `${hostname}${base}light.png` }],
+    ["meta", { name: "twitter:card", content: "summary_large_image" }],
   ],
+
+  transformHead: ({ pageData, siteConfig }) => {
+    const head: HeadConfig[] = [];
+    const frontmatter = pageData.frontmatter;
+    const title = frontmatter.title
+      ? `${frontmatter.title} | ${siteConfig.siteConfig.title}`
+      : siteConfig.siteConfig.title;
+    const description = frontmatter.description || siteConfig.siteConfig.description;
+    const pagePath = pageData.relativePath.replace(/\.md$/, "").replace(/index$/, "");
+    const pageUrl = `${hostname}${base}${pagePath}`;
+
+    head.push(["meta", { property: "og:title", content: title }]);
+    head.push(["meta", { property: "og:description", content: description }]);
+    head.push(["meta", { property: "og:url", content: pageUrl }]);
+    head.push(["meta", { name: "twitter:title", content: title }]);
+    head.push(["meta", { name: "twitter:description", content: description }]);
+    head.push(["link", { rel: "canonical", href: pageUrl }]);
+
+    return head;
+  },
 
   themeConfig: {
     logo: "/logo.svg",
@@ -99,7 +135,7 @@ export default defineConfig({
 
     footer: {
       message: "Released under the MIT License.",
-      copyright: "Copyright © 2024-present Akkil",
+      copyright: "Copyright © 2026-present Akkil",
     },
 
     search: {

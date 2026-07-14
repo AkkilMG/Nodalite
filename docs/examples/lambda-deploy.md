@@ -1,3 +1,7 @@
+---
+description: Lambda deployment example: the same App deployed as an AWS Lambda function with esbuild bundle and zip build script.
+---
+
 # Lambda Deployment Example
 
 The same `App` shape from `basic-api`, deployed as a real AWS Lambda function

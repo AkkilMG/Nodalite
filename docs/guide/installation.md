@@ -1,3 +1,7 @@
+---
+description: Install Nodalite and set up your project. Requirements, package installation, and workspace configuration for Node.js, Bun, Deno, Lambda, and Edge.
+---
+
 # Installation
 
 ## Requirements

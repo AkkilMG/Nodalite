@@ -1,3 +1,7 @@
+---
+description: Get a Nodalite API server running in two minutes. Install, create an app, and start serving on Node.js, Lambda, Cloudflare Workers, Bun, or Deno.
+---
+
 # Quick Start
 
 Get a Nodalite API server running in two minutes.

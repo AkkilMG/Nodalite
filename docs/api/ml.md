@@ -1,3 +1,7 @@
+---
+description: API reference for @nodalite/ml: cached, engine-agnostic ML inference runner with ONNX support, disk caching, and serverless cold start optimization.
+---
+
 # @nodalite/ml
 
 Cached, engine-agnostic ML inference runner designed for serverless cold starts.

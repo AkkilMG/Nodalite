@@ -1,3 +1,7 @@
+---
+description: API reference for @nodalite/adapter-lambda: createLambdaHandler() for AWS Lambda with API Gateway v1/v2 and Function URL support.
+---
+
 # @nodalite/adapter-lambda
 
 Run a Nodalite app on AWS Lambda behind API Gateway v1/v2 or Lambda Function URLs.

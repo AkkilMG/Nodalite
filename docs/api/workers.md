@@ -1,3 +1,7 @@
+---
+description: API reference for @nodalite/workers: runDetached() for supervised background worker_threads and WorkerPool for CPU offload.
+---
+
 # @nodalite/workers
 
 Independent background threads and CPU offload for Node.js.

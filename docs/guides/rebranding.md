@@ -1,3 +1,7 @@
+---
+description: Guide to renaming and rebranding Nodalite: check npm availability, update package scopes, search-replace names, and update documentation.
+---
+
 # Naming & Rebranding
 
 This repo uses **Nodalite** as a working name. Before publishing for real:

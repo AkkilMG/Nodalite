@@ -1,3 +1,7 @@
+---
+description: Scaffold a new Nodalite project with npm create nodalite. Interactive CLI generates API servers, Lambda functions, Edge workers, or Telegram bots.
+---
+
 # Scaffolding
 
 Create a new Nodalite project in seconds with the interactive scaffolding CLI.

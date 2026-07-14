@@ -1,3 +1,7 @@
+---
+description: API reference for all Nodalite packages: core, middleware, auth, adapters, WebSocket, workers, scheduler, OpenTelemetry, ML inference, and OpenAPI.
+---
+
 # API Reference
 
 | Package | Exports | Runtime deps |

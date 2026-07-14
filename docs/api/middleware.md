@@ -1,3 +1,7 @@
+---
+description: API reference for @nodalite/middleware: CORS, security headers, rate limiting, JWT auth, body limits, and distributed rate-limit stores.
+---
+
 # @nodalite/middleware
 
 First-party security and utility middleware. Zero runtime dependencies of its

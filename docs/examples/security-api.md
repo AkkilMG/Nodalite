@@ -1,3 +1,7 @@
+---
+description: Security API example: comprehensive demonstration of all security middleware in @nodalite/middleware composing together in a real API.
+---
+
 # Security API Example
 
 Comprehensive demonstration of all 9 new security middleware in

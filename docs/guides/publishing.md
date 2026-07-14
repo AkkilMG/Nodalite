@@ -1,3 +1,7 @@
+---
+description: Guide to publishing and versioning Nodalite packages: npm workspaces, tsup builds, Changesets, dual ESM/CJS, and release workflow.
+---
+
 # Publishing & Versioning
 
 ## Monorepo tooling

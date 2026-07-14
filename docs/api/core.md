@@ -1,3 +1,7 @@
+---
+description: API reference for @nodalite/core: App, Context, Router, HttpError, compose, validate, and discover. Zero runtime dependencies.
+---
+
 # @nodalite/core
 
 The foundation of Nodalite. Zero runtime dependencies.

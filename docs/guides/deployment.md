@@ -1,3 +1,7 @@
+---
+description: Deploy Nodalite to Node.js, Docker, AWS Lambda, Cloudflare Workers, Bun, and Deno. Quick reference for every deployment target.
+---
+
 # Deployment
 
 Nodalite runs everywhere. Here's the quick-reference for each target.
