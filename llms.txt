@@ -1,0 +1,83 @@
+# Nodalite
+
+> Runtime-agnostic TypeScript API framework. The same App runs unmodified on Node.js, Bun, Deno, Cloudflare Workers, and AWS Lambda.
+
+## Overview
+
+Nodalite is a small, zero-dependency TypeScript API framework built on the standard Fetch API (Request/Response). It provides routing, middleware, validation, authentication, WebSocket support, observability, background workers, ML inference, and OpenAPI generation — all runtime-agnostic.
+
+## Key Features
+
+- Runtime-agnostic: same code runs on Node, Bun, Deno, Cloudflare Workers, AWS Lambda
+- Zero runtime dependencies in core (@nodalite/core)
+- Built-in security: CORS, security headers, rate limiting, JWT auth, body size limits
+- Full auth stack: JWT access/refresh tokens, OAuth2 PKCE (Google, GitHub, Discord), RBAC, sessions, CSRF
+- WebSocket support: rooms, heartbeat, path-based routing across all runtimes
+- Observability: OpenTelemetry tracing and HTTP metrics
+- Background threads: worker_threads for bots, pollers, CPU offload
+- ML inference: serverless-aware model runner with ONNX Runtime adapter
+- OpenAPI 3.1.0 spec generation, Swagger UI, and ReDoc
+- Route auto-discovery from file system
+- Request validation via Standard Schema (Zod, Valibot, ArkType)
+
+## Documentation
+
+- [Home](https://nodalite.akkil.dev/)
+- [Introduction](https://nodalite.akkil.dev/guide/)
+- [Quick Start](https://nodalite.akkil.dev/guide/quickstart)
+- [Scaffolding](https://nodalite.akkil.dev/guide/scaffolding)
+- [Installation](https://nodalite.akkil.dev/guide/installation)
+- [Core Concepts](https://nodalite.akkil.dev/guide/core-concepts)
+
+## API Reference
+
+- [Overview](https://nodalite.akkil.dev/api/)
+- [@nodalite/core](https://nodalite.akkil.dev/api/core) — App, Context, Router, HttpError, validate, discover
+- [@nodalite/middleware](https://nodalite.akkil.dev/api/middleware) — cors, securityHeaders, rateLimit, jwtAuth, bodyLimit
+- [@nodalite/auth](https://nodalite.akkil.dev/api/auth) — JWT, OAuth2 PKCE, RBAC, sessions, password hashing, CSRF
+- [@nodalite/adapter-node](https://nodalite.akkil.dev/api/adapter-node) — serve() for Node.js
+- [@nodalite/adapter-lambda](https://nodalite.akkil.dev/api/adapter-lambda) — createLambdaHandler() for AWS Lambda
+- [@nodalite/adapter-edge](https://nodalite.akkil.dev/api/adapter-edge) — createEdgeHandler() for Cloudflare Workers
+- [@nodalite/ws](https://nodalite.akkil.dev/api/ws) — WsServer, rooms, heartbeat, multi-runtime adapters
+- [@nodalite/workers](https://nodalite.akkil.dev/api/workers) — runDetached(), WorkerPool
+- [@nodalite/scheduler](https://nodalite.akkil.dev/api/scheduler) — Scheduler, cron/interval, toServerlessTask
+- [@nodalite/otel](https://nodalite.akkil.dev/api/otel) — OpenTelemetry middleware, metrics, span enrichment
+- [@nodalite/ml](https://nodalite.akkil.dev/api/ml) — Model, onnxEngine, cached inference
+- [@nodalite/openapi](https://nodalite.akkil.dev/api/openapi) — OpenAPI 3.1.0, Swagger UI, ReDoc
+- [Errors](https://nodalite.akkil.dev/api/errors) — HttpError class reference
+
+## Guides
+
+- [Deployment](https://nodalite.akkil.dev/guides/deployment) — Node, Lambda, Cloudflare Workers, Bun, Deno
+- [Security Checklist](https://nodalite.akkil.dev/guides/security) — OWASP-recommended middleware
+- [Background Threads](https://nodalite.akkil.dev/guides/background-threads) — worker_threads, serverless limits
+- [ML Inference](https://nodalite.akkil.dev/guides/ml-inference) — serverless-aware model caching
+- [Testing Strategy](https://nodalite.akkil.dev/guides/testing) — real integration tests
+- [TypeScript](https://nodalite.akkil.dev/guides/typescript) — generics, typed routes, validation
+
+## Packages
+
+- nodalite / @nodalite/core — core framework, zero dependencies
+- @nodalite/middleware — security and HTTP middleware
+- @nodalite/auth — authentication and authorization
+- @nodalite/adapter-node — Node.js server adapter
+- @nodalite/adapter-lambda — AWS Lambda adapter
+- @nodalite/adapter-edge — Cloudflare Workers adapter
+- @nodalite/ws — WebSocket server
+- @nodalite/workers — background threads
+- @nodalite/scheduler — cron and interval scheduling
+- @nodalite/otel — OpenTelemetry integration
+- @nodalite/ml — ML inference runner
+- @nodalite/openapi — OpenAPI spec generation
+
+## Install
+
+npm install nodalite
+
+## Repository
+
+https://github.com/AkkilMG/Nodalite
+
+## License
+
+MIT

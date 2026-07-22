@@ -1,0 +1,121 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://nodalite.akkil.dev/#website",
+      "name": "Nodalite",
+      "url": "https://nodalite.akkil.dev",
+      "description": "Runtime-agnostic TypeScript API framework documentation — guides, API reference, examples, and deployment tips.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Arkynox",
+        "url": "https://github.com/AkkilMG",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://nodalite.akkil.dev/logo.svg"
+        }
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://nodalite.akkil.dev/search?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "https://nodalite.akkil.dev/#software",
+      "name": "Nodalite",
+      "description": "Runtime-agnostic TypeScript API framework — runs on Node.js, Bun, Deno, Cloudflare Workers, and AWS Lambda.",
+      "url": "https://nodalite.akkil.dev",
+      "codeRepository": "https://github.com/AkkilMG/Nodalite",
+      "codeSampleType": "CodeSnippet",
+      "programmingLanguage": ["TypeScript", "JavaScript"],
+      "runtimePlatform": ["Node.js", "Bun", "Deno", "Cloudflare Workers", "AWS Lambda"],
+      "license": "https://opensource.org/licenses/MIT",
+      "author": {
+        "@type": "Person",
+        "name": "Akkil MG",
+        "url": "https://akkil.dev"
+      },
+      "keywords": "typescript, serverless, runtime-agnostic, api framework, node.js, cloudflare workers, aws lambda, bun, deno, websocket, authentication, openapi",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Cross-platform",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "description": "Free and open source under MIT License"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://nodalite.akkil.dev/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://nodalite.akkil.dev"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Guide",
+          "item": "https://nodalite.akkil.dev/guide/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "API Reference",
+          "item": "https://nodalite.akkil.dev/api/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Guides",
+          "item": "https://nodalite.akkil.dev/guides/deployment"
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "Examples",
+          "item": "https://nodalite.akkil.dev/examples/basic-api"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://nodalite.akkil.dev/faq#faqpage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why use Fetch API instead of Express-style req/res?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The standard Request/Response API is implemented natively by Node 18+, Bun, Deno, and Cloudflare Workers. Building on it means the same code runs everywhere without adaptation layers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Nodalite production ready?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Nodalite provides built-in security middleware (CORS, rate limiting, JWT auth, CSRF, SSRF protection), OpenTelemetry observability, and runs on every major JavaScript runtime. It is designed for production use."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Nodalite compare to Express, Fastify, and Hono?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Unlike Express and Fastify which are Node-only, Nodalite runs on Node, Bun, Deno, Cloudflare Workers, and AWS Lambda with the same code. It includes built-in security, background threads, and ML inference that other frameworks lack."
+          }
+        }
+      ]
+    }
+  ]
+}
